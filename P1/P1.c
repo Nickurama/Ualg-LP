@@ -116,7 +116,7 @@ void test_fuel()
         printf("%d %.2f %.3f\n", index, cost, cost_per_liter);
     }
 }
-
+//
 // MAIN
 // Este main esta preparado para receber um argumento quando o programa e executado.
 // Esse argumento, que se espera que seja um caracter
