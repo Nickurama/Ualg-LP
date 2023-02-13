@@ -1,4 +1,5 @@
 #include <stdio.h>
+const char *author = "Diogo Fonseca";
 
 void soma_2(int x, int y, int *out)
 {

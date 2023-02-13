@@ -1,4 +1,5 @@
 #include <stdio.h>
+const char *author = "Diogo Fonseca";
 
 void f1(int val)
 {
