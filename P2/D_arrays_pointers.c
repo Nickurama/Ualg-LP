@@ -37,7 +37,7 @@ void reverseStr(char *s)
     int size = get_size_str(s);
     int half_size = size / 2;
     for (int i = 0; i < half_size; i++)
-        *(s + i) = *(s + size - 1 - i);
+        swap_char(s + i, s + size - 1 - i);
 }
 
 int chars_to_ints(const char *str, int *a)
@@ -75,8 +75,8 @@ int main()
             print_max(input, size);
         }
         else
-        {
-        } // unspecified
+        { // unspecified
+        }
     }
     return 0;
 }
