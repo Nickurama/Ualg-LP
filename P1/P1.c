@@ -8,7 +8,7 @@
 #include "our_doubles.h"
 const char *author = "Diogo Fonseca";
 
-// Programa A -----------------------------------------------------------------------------------
+// Programa A -----------------------------------------------------------------------------------x
 int covid(int *a, int n, int *b, const int x)
 {
     for (int i = 0; i < n; i++)
@@ -115,7 +115,7 @@ void test_fuel()
         printf("%d %.2f %.3f\n", index, cost, cost_per_liter);
     }
 }
-//
+
 // MAIN
 // Este main esta preparado para receber um argumento quando o programa e executado.
 // Esse argumento, que se espera que seja um caracter
@@ -127,7 +127,6 @@ int main(const int argc, const char *argv[])
     int x = 'G';
     if (argc > 1)
         x = *argv[1];
-
     if (x == 'A')
         testA();
     else if (x == 'B')
