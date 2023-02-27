@@ -8,8 +8,6 @@
 #include "our_doubles.h"
 const char *author = "Diogo Fonseca";
 
-const int GRADES_AMMOUNT = 10;
-
 enum grade_state
 {
     Aprovado,
@@ -23,7 +21,7 @@ typedef struct student
 {
     int number;
     char name[1000];
-    int grades[GRADES_AMMOUNT];
+    int grades[10];
     int total_points;
     enum grade_state gr_state;
 } student;
@@ -60,15 +58,15 @@ char *grade_state_to_str(enum grade_state gs)
 {
     char *str = (char *)malloc(15 * sizeof(char));
     if (gs == 1)
-        *str = "Aprovado";
+        str = "Aprovado"; // HERE IS THE PROBLEM!!!
     else if (gs == 2)
-        *str = "Reprovado";
+        str = "Reprovado";
     else if (gs == 3)
-        *str = "Faltou";
+        str = "Faltou";
     else if (gs == 4)
-        *str = "Nao_Admitido";
+        str = "Nao_Admitido";
     else if (gs == 5)
-        *str = "Sem_Frequencia";
+        str = "Sem_Frequencia";
     return str;
 }
 
@@ -118,7 +116,8 @@ void println_student(student *stdnt)
     }
 
     char *gs_str_ptr = grade_state_to_str(stdnt->gr_state);
-    char gs_str[15] = *gs_str_ptr;
+    char gs_str[15];
+    strcpy(gs_str, gs_str_ptr);
     free(gs_str_ptr);
     gs_str_ptr = NULL;
 
