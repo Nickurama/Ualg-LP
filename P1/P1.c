@@ -104,8 +104,7 @@ void test_fuel()
     double prices[1000];
     double discounts[1000];
     double max_discounts[1000];
-    int length;
-    length = doubles_get_until(-1, prices);
+    int length = doubles_get_until(-1, prices);
     doubles_get_until(-1, discounts);
     doubles_get_until(-1, max_discounts);
     while (scanf("%d", &input) != EOF)
