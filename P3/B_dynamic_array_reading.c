@@ -18,10 +18,11 @@ int *ints_get_to_heap(int n)
 
 char **strings_get_to_heap(int n)
 {
-    char **s = malloc(n*sizeof(int));
+    char *str = malloc(1000*n*sizeof(char));
     for (int i = 0; i < n; i++)
     {
-        scanf("%s", s[i]);
+        char s[1000];
+        scanf("%s", str[i]);
     }
     return s;
 }
