@@ -4,11 +4,14 @@
 #include <limits.h>
 #include <string.h>
 #include <math.h>
+
 #include "our_ints.h"
 #include "our_doubles.h"
+#include "monstro.h"
+
 const char *author = "Diogo Fonseca";
 
-//PROBLEMA A ---------------------------------------------------------------------------------
+// PROBLEMA A ---------------------------------------------------------------------------------
 
 enum grade_state
 {
@@ -176,44 +179,100 @@ void testA()
     println_students(students, n);
 }
 
-//PROBLEMA B ---------------------------------------------------------------------------------
+// PROBLEMA B ---------------------------------------------------------------------------------
 
 int *ints_get_to_heap(int n)
 {
-    int *a = malloc(n*sizeof(int));
+    int *a = malloc(n * sizeof(int));
     for (int i = 0; i < n; i++)
-        scanf("%s", a[i]);
+        scanf("%d", &a[i]);
     return a;
 }
 
 char **strings_get_to_heap(int n)
 {
-    char **str = malloc(n*sizeof(char));
+    char **str = malloc(n * sizeof(char));
+    char buffer[1000];
     for (int i = 0; i < n; i++)
     {
-        char buffer[1000];
         scanf("%s", buffer);
-        char *s = malloc(sizeof(char)*strlen(buffer));
+        str[i] = malloc(strlen(buffer) * sizeof(char));
+        strcpy(str[i], buffer);
     }
-    return n;
+    return str;
+}
+
+int *ints_get_unknown_number(int *out_size)
+{
+    out_size = malloc(2 * sizeof(int));
+    int size = 1;
+    while (scanf("%d", &out_size[size++]) != EOF)
+        out_size = realloc(out_size, (2 + size) * sizeof(int));
+    out_size[0] = size - 1;
+    return out_size;
+}
+
+void strs_println(char **str_array, int length)
+{
+    printf("%s", str_array[0]);
+    for (int i = 1; i < length; i++) // i = 1
+        printf(", %s", str_array[i]);
+    printf("\n");
 }
 
 void testB()
 {
+    char input;
+    int param;
 
+    while (scanf("%c", &input) != EOF)
+    {
+        if (input == 'i')
+        {
+            scanf("%d", &param);
+            int *array = ints_get_to_heap(param); // MEMORY NEEDS TO BE FREED!!!
+            ints_println(array, param, ",");
+        }
+        else if (input == 's')
+        {
+            scanf("%d", &param);
+            char **str_array = strings_get_to_heap(param); // MEMORY NEEDS TO BE FREED!!!
+            strs_println(str_array, param);
+        }
+        else if (input == '?')
+        {
+            int *array = ints_get_unknown_number(array); // MEMORY NEEDS TO BE FREED!!!
+            ints_println(array + 1, array[0] - 1, ",");
+        }
+    }
+}
+// PROBLEMA C ---------------------------------------------------------------------------------
+
+void testC()
+{
 }
 
-//MAIN ---------------------------------------------------------------------------------------
+// PROBLEMA F ---------------------------------------------------------------------------------
+
+void testF()
+{
+}
+
+// MAIN ---------------------------------------------------------------------------------------
 
 int main(const int argc, const char *argv[])
 {
-    int x = 'B';
+    int x = 'F';
     if (argc > 1)
         x = *argv[1];
     if (x == 'A')
         testA();
     else if (x == 'B')
         testB();
+    else if (x == 'C')
+        testC();
+    else if (x == 'F')
+        testF();
     else if (x == 'U')
         printf("All unit tests PASSED.\n");
 
