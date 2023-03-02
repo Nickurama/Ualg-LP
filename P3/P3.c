@@ -178,7 +178,6 @@ void testA()
 
 //PROBLEMA B ---------------------------------------------------------------------------------
 
-/*
 int *ints_get_to_heap(int n)
 {
     int *a = malloc(n*sizeof(int));
@@ -197,7 +196,6 @@ char **strings_get_to_heap(int n)
     }
     return n;
 }
-*/
 
 void testB()
 {
@@ -208,7 +206,7 @@ void testB()
 
 int main(const int argc, const char *argv[])
 {
-    int x = 'A';
+    int x = 'B';
     if (argc > 1)
         x = *argv[1];
     if (x == 'A')
