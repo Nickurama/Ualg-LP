@@ -8,6 +8,8 @@
 #include "our_doubles.h"
 const char *author = "Diogo Fonseca";
 
+//PROBLEMA A ---------------------------------------------------------------------------------
+
 enum grade_state
 {
     Aprovado,
@@ -57,21 +59,22 @@ enum grade_state str_to_grade_state(char *s)
 char *grade_state_to_str(enum grade_state gs)
 {
     char *str = (char *)malloc(15 * sizeof(char));
-    if (gs == 1)
-        str = "Aprovado"; // HERE IS THE PROBLEM!!!
-    else if (gs == 2)
-        str = "Reprovado";
-    else if (gs == 3)
-        str = "Faltou";
-    else if (gs == 4)
-        str = "Nao_Admitido";
-    else if (gs == 5)
-        str = "Sem_Frequencia";
+    if (gs == Aprovado)
+        strcpy(str, "Aprovado");
+    else if (gs == Reprovado)
+        strcpy(str, "Reprovado");
+    else if (gs == Faltou)
+        strcpy(str, "Faltou");
+    else if (gs == Nao_Admitido)
+        strcpy(str, "Nao_Admitido");
+    else if (gs == Sem_Frequencia)
+        strcpy(str, "Sem_Frequencia");
     return str;
 }
 
 void update_grade_state(student *stdnt)
 {
+    printf("total points: %d\n", stdnt->total_points);
     if (stdnt->total_points == 0)
         stdnt->gr_state = Sem_Frequencia;
     else if ((stdnt->grades[8] == 0) && (stdnt->grades[9] == 0))
@@ -109,7 +112,6 @@ void println_student(student *stdnt)
     printf("%s ", stdnt->name);
     for (int i = 0; i < 10; i++)
     {
-        stdnt->total_points += stdnt->grades[i];
         printf("%d", stdnt->grades[i]);
         if (i + 1 < 10)
             printf(",");
@@ -133,6 +135,9 @@ void println_students(student *students, int n)
 void update_points(student *stdnt, int n, int score)
 {
     stdnt->grades[n - 1] = score;
+    stdnt->total_points = 0;
+    for (int i = 0; i < 10; i++)
+        stdnt->total_points += stdnt->grades[i];
 }
 
 int get_students(student *stdnts, int n)
@@ -148,7 +153,7 @@ int get_students(student *stdnts, int n)
     return n;
 }
 
-int main()
+void testA()
 {
     int n;
     scanf("%d", &n);
@@ -161,9 +166,57 @@ int main()
         {
             if (students[i].number == number)
                 update_points(&students[i], grade, points);
-            update_grade_state(&students[i]);
         }
     }
+    for (int i = 0; i < n; i++)
+    {
+        update_grade_state(&students[i]);
+        printf("correct total: %d\n", students[i].total_points);
+    }
     println_students(students, n);
+}
+
+//PROBLEMA B ---------------------------------------------------------------------------------
+
+/*
+int *ints_get_to_heap(int n)
+{
+    int *a = malloc(n*sizeof(int));
+    for (int i = 0; i < n; i++)
+        scanf("%s", a[i]);
+    return a;
+}
+
+char **strings_get_to_heap(int n)
+{
+    char *str = malloc(1000*n*sizeof(char));
+    for (int i = 0; i < n; i++)
+    {
+        char s[1000];
+        scanf("%s", str[i]);
+    }
+    return n;
+}
+*/
+
+void testB()
+{
+
+}
+
+//MAIN ---------------------------------------------------------------------------------------
+
+int main(const int argc, const char *argv[])
+{
+    int x = 'A';
+    if (argc > 1)
+        x = *argv[1];
+    if (x == 'A')
+        testA();
+    else if (x == 'B')
+        testB();
+    else if (x == 'U')
+        printf("All unit tests PASSED.\n");
+
     return 0;
 }
