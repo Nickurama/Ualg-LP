@@ -89,6 +89,12 @@ void free_monstro(Monstro *m)
     free(m);
 }
 
+void free_monstros(Monstro **m, int n)
+{
+    for (int i = 0; i < n; i++)
+        free_monstro(m[i]);
+}
+
 Monstro *monstro_dup(Monstro *m)
 {
     return monstro(m->nome, m->tipo, m->tam, m->ac, m->hp, m->cr, m->trait);
@@ -189,8 +195,7 @@ void test_F_S2()
     {
         double cr_min, cr_max;
         Monstro *m_result[n];
-        monsters_to_monsters_ptr(*m, n, m_result);
-        int size_result = pesquisa_monstros_tipo(m_result, m_result, n, tipo);
+        int size_result = pesquisa_monstros_tipo(m, m_result, n, tipo);
         if (strcmp(cr_min_str, "*"))
         {
             cr_min = atof(cr_min_str);
@@ -203,4 +208,6 @@ void test_F_S2()
         else
             println_monstros(m_result, size_result);
     }
+
+    free_monstros(m, n);
 }

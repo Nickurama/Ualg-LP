@@ -9,8 +9,6 @@
 #include "our_doubles.h"
 #include "monstro.h"
 
-const char *author = "Diogo Fonseca";
-
 // PROBLEMA A ---------------------------------------------------------------------------------
 
 enum grade_state
@@ -256,6 +254,7 @@ void testC()
 
 void testF()
 {
+    test_F_S2();
 }
 
 // MAIN ---------------------------------------------------------------------------------------
