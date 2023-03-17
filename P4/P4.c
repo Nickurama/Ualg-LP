@@ -173,9 +173,29 @@ void print_point2d(struct Point2D p)
     printf("(%d,%d)", p.x, p.y);
 }
 
+void add_identations(FILE *f, int identation_level)
+{
+    for (int i = 0; i < identation_level; i++)
+        fprintf(f, "\t");
+}
+
 void point2d_write_json(FILE *f, struct Point2D p, int identation_level)
 {
-    // TODO
+    // line 1
+    add_identations(f, identation_level);
+    fprintf(f, "\"position\": {\n");
+
+    // line 2
+    add_identations(f, identation_level + 1);
+    fprintf(f, "\"x\": %d,\n", p.x);
+
+    // line 3
+    add_identations(f, identation_level + 1);
+    fprintf(f, "\"y\": %d\n", p.y);
+
+    // line 4
+    add_identations(f, identation_level);
+    fprintf(f, "},\n");
 }
 
 struct Color
@@ -188,7 +208,29 @@ struct Color
 
 void color_write_json(FILE *f, struct Color *c, int identation_level)
 {
-    // TODO
+    // line 1
+    add_identations(f, identation_level);
+    fprintf(f, "\"color\": {\n");
+
+    // line 2
+    add_identations(f, identation_level + 1);
+    fprintf(f, "\"r\": %d,\n", c->r);
+
+    // line 3
+    add_identations(f, identation_level + 1);
+    fprintf(f, "\"g\": %d,\n", c->g);
+
+    // line 4
+    add_identations(f, identation_level + 1);
+    fprintf(f, "\"b\": %d,\n", c->b);
+
+    // line 5
+    add_identations(f, identation_level + 1);
+    fprintf(f, "\"alpha\": %.2lf\n", c->alpha);
+
+    // line 6
+    add_identations(f, identation_level);
+    fprintf(f, "},\n");
 }
 
 void print_color(struct Color *c)
@@ -209,12 +251,47 @@ struct Rectangle
 
 void rectangle_write_json(FILE *f, struct Rectangle *r, int identation_level)
 {
-    // TODO
+    point2d_write_json(f, r->position, identation_level);
+
+    add_identations(f, identation_level);
+    fprintf(f, "\"width\": %d,\n", r->width);
+
+    add_identations(f, identation_level);
+    fprintf(f, "\"height\": %d,\n", r->height);
+
+    color_write_json(f, r->color, identation_level);
+
+    add_identations(f, identation_level);
+    fprintf(f, "\"name\": \"%s\",\n", r->name);
+
+    add_identations(f, identation_level);
+    fprintf(f, "\"description\": \"%s\",\n", r->description);
+
+    add_identations(f, identation_level);
+    fprintf(f, "\"type\": \"%s\"\n", r->type);
 }
 
-void rectangles_write_json(FILE *f, struct Rectangle *rectangles[], int n, int identationLevel)
+void rectangles_write_json(FILE *f, struct Rectangle *rectangles[], int n, int identation_level)
 {
-    // TODO
+    add_identations(f, identation_level);
+    fprintf(f, "[\n");
+
+    for (int i = 0; i < n; i++)
+    {
+        add_identations(f, identation_level + 1);
+        fprintf(f, "{\n");
+
+        rectangle_write_json(f, rectangles[i], identation_level + 2);
+
+        add_identations(f, identation_level + 1);
+        if (i + 1 == n)
+            fprintf(f, "}\n");
+        else
+            fprintf(f, "},\n");
+    }
+
+    add_identations(f, identation_level);
+    fprintf(f, "]\n");
 }
 
 struct Rectangle *rectangle(int x, int y, int width, int height, struct Color c, char *name, char *description, const char *type)
@@ -316,7 +393,6 @@ void free_rectangle(struct Rectangle *r)
 
 void testD(void)
 {
-    /*
     int seed;
 
     scanf("%d", &seed);
@@ -329,8 +405,14 @@ void testD(void)
         rectangles[i] = random_mock_rectangle();
     }
 
-    // TODO
-    */
+    FILE *f = fopen("rectangles.json", "w");
+    rectangles_write_json(f, rectangles, 5, 0);
+    fclose(f);
+
+    for (int i = 0; i < 5; i++)
+    {
+        free_rectangle(rectangles[i]);
+    }
 }
 
 // Problema E
