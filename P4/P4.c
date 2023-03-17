@@ -430,41 +430,58 @@ typedef char (*CharOperator)(char);
 
 void map(int in[], int n, IntOperator op)
 {
-    // TODO
+    for (int i = 0; i < n; i++)
+        in[i] = op(in[i]);
 }
 
 void map_string(char a[], int n, CharOperator op)
 {
-    // TODO
+    for (int i = 0; i < n; i++)
+        a[i] = op(a[i]);
 }
 
 int all(int a[], int n, IntPredicate p)
 {
-    // TODO
-    return 0;
+    for (int i = 0; i < n; i++)
+        if (!p(a[i]))
+            return 0;
+    return 1;
 }
 
 int any(int a[], int n, IntPredicate p)
 {
-    // TODO
+    for (int i = 0; i < n; i++)
+        if (p(a[i]))
+            return 1;
     return 0;
 }
 
 int filter(int in[], int out[], int n, IntPredicate p)
 {
-    // TODO
-    return 0;
+    int size = 0;
+    for (int i = 0; i < n; i++)
+        if (p(in[i]))
+            out[size++] = in[i];
+    return size;
 }
 
 int *find_first(int a[], int n, IntPredicate p)
 {
+    for (int i = 0; i < n; i++)
+        if (p(a[i]))
+            return &a[i];
     return NULL;
 }
 
 int reduce_or_default(int a[], int n, int default_value, IntBinaryOperator op)
 {
-    // TODO
-    return 0;
+    if (n <= 0)
+        return default_value;
+
+    int buffer = a[0];
+    for (int i = 1; i < n; i++)
+        buffer = op(buffer, a[i]);
+    return buffer;
 }
 
 void testE(void)
