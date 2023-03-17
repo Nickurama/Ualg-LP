@@ -99,10 +99,7 @@ char **my_tokenizer(const char *s, const char *delim, int *out_token_count)
         char *token = malloc((token_length + 1) * sizeof(char));
         memcpy(token, s, token_length * sizeof(char));
         token[token_length] = '\0';
-        printf("token_length: %d, ", token_length);
-        printf("token: %s\n", token);
         tokens = realloc(tokens, (str_ar_len + 1) * sizeof(char *));
-        // printf("token: %s\n", tokens[str_ar_len]);
         tokens[str_ar_len++] = token;
         s += token_length + 1;
         s_len -= token_length + 1;
