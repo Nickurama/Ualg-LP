@@ -1,0 +1,15 @@
+14
+Bugbear,Humanoid,Medium,16,27,1,Smelly
+Hobgoblin,Humanoid,Medium,18,9,0.5,Martial Advantage
+Cult Fanatic,Humanoid,Medium,13,33,2,Dark Devotion
+Zombie,Undead,Medium,8,22,0.25,Undead Fortitude
+Imp,Fiend,Tiny,13,9,1,Shapechanger
+Air Elemental,Elemental,Large,15,90,5,Air Form
+Giant Ape,Beast,Huge,12,157,7,None
+Allosaurus,Beast,Large,13,51,2,Pounce
+Dragon Turtle,Dragon,Gargantuan,20,341,17,Amphibious
+Acient Brass Dragon,Dragon,Gargantuan,20,297,20,Legendary Resistance
+Giant Rat,Beast,Small,12,7,0.125,Pack Tactics
+Flying Snake,Beast,Tiny,14,5,0.125,Flyby
+Dire Wolf,Beast,Large,14,37,1,Keen Hearing and Smell
+Exploding Zombie,Undead,Medium,8,8,0.125,Exploding death

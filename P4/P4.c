@@ -77,20 +77,10 @@ void testB(void)
 }
 
 // Problema C
-
-// crops the string s from the start to n, placing it on out
-char *str_crop(const char *s, int n, char *out)
-{
-    for (int i = 0; i < n; i++)
-        out[i] = s[i];
-    out[n] = '\0'; // uses n + 1 slots
-    return out;
-}
-
 char **my_tokenizer(const char *s, const char *delim, int *out_token_count)
 {
     int s_len = strlen(s);
-    int token_length = strcspn(s, delim);
+    int token_length;
     char **tokens = malloc(sizeof(char *));
     int str_ar_len = 0;
 
