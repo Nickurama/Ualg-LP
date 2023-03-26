@@ -337,9 +337,9 @@ void teste_ranking()
 
 /*
 Dúvidas:
-    -Projeto
     -delimite? ou dar print/fazer só para aquele caso específico do \t?
     -realloc on loop?
     -no space on last line
     -free on subspace (free(accepted))
+    -deep copy no constructor?
 */
