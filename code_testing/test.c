@@ -7,23 +7,9 @@
 
 int main(void)
 {
-    char *strings[100];
-    char buffer[100];
-    int n = 0;
-    // int read;
-
-    // este código tem um problema se o input começar com \n
-    while (scanf("%[^\n]%*c", buffer) != EOF)
-    {
-        printf("test 1");
-        strings[n++] = strdup(buffer);
-        printf("test 2");
-    }
-
-    for (int i = 0; i < n; i++)
-    {
-        printf("%s\n", strings[i]);
-    }
-
+    int ns[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    int i = 3;
+    ns[i++] = ns[i] - 1; // ns[3] = ns[3] - 1
+    printf("%d\n", ns[i]);
     return 0;
 }
