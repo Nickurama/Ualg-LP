@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "type_traits": "c",
-        "our_doubles.h": "c",
-        "submission.h": "c"
-    }
-}
