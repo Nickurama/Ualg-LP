@@ -180,11 +180,11 @@ Submission *submission_cnstrct(int number, Date *time, int points, char *group, 
     sub->state = state;
 
     // strings
-    sub->group = malloc(strlen(group) * sizeof(char));
-    sub->id = malloc(strlen(id) * sizeof(char));
-    sub->team = malloc(strlen(team) * sizeof(char));
-    sub->problem = malloc(strlen(problem) * sizeof(char));
-    sub->language = malloc(strlen(language) * sizeof(char));
+    sub->group = malloc((strlen(group) + 1) * sizeof(char));
+    sub->id = malloc((strlen(id) + 1) * sizeof(char));
+    sub->team = malloc((strlen(team) + 1) * sizeof(char));
+    sub->problem = malloc((strlen(problem) + 1) * sizeof(char));
+    sub->language = malloc((strlen(language) + 1) * sizeof(char));
 
     strcpy(sub->group, group);
     strcpy(sub->id, id);
@@ -339,7 +339,7 @@ void teste_ranking()
 Dúvidas:
     -delimite? ou dar print/fazer só para aquele caso específico do \t?
     -realloc on loop?
-    -no space on last line
+    -no white space on last line
     -free on subspace (free(accepted))
     -deep copy no constructor?
 */
