@@ -2,6 +2,6 @@
 
 int main()
 {
-    teste_leitura_simples();
+    teste_estatisticas();
     return 0;
 }

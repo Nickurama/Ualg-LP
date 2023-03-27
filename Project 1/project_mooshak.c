@@ -18,6 +18,10 @@ const int DATE_STR_SIZE = 17; // 16 + 1
 const char FILE_DELIM[1] = "\t";
 const char PRINT_DELIM[1] = ",";
 const int MAX_LINE_SIZE = 564; // number is hardcoded in get_subs_from_file()
+const char *COMMAND_STAT = "STATS";
+const char *COMMAND_UPDATE = "UPDATE";
+const char *COMMAND_ORDER = "ORDER";
+#define TIME_FORMAT = "%d/%d/%d %d:%d"
 
 // Types
 
@@ -74,15 +78,17 @@ char **my_tokenizer(const char *s, const char *delim, int *out_token_count)
 {
     int s_len = strlen(s);
     int token_length;
-    char **tokens = malloc(sizeof(char *));
+    char **tokens = malloc(100 * sizeof(char *));
     int str_ar_len = 0;
 
     while ((token_length = strcspn(s, delim)) <= s_len)
     {
+        if ((str_ar_len % 100) == 0)
+            tokens = realloc(tokens, (((str_ar_len / 100) + 1) * 100) * sizeof(char *));
         char *token = malloc((token_length + 1) * sizeof(char));
         memcpy(token, s, token_length * sizeof(char));
         token[token_length] = '\0';
-        tokens = realloc(tokens, (str_ar_len + 1) * sizeof(char *));
+
         tokens[str_ar_len++] = token;
         s += token_length + 1;
         s_len -= token_length + 1;
@@ -151,12 +157,6 @@ Date *str_to_date(const char *str) // Format: YYYY/MM/DD HH:MM
 char *date_to_str(char *str_out, Date *d) // Format: YYYY/MM/DD HH:MM
 {
     sprintf(str_out, "%d/%d/%d %d:%d", d->year, d->month, d->day, d->hour, d->minute);
-    return str_out;
-}
-
-char *date_to_str_no_hours(char *str_out, Date *d) // Format: YYYY/MM/DD
-{
-    sprintf(str_out, "%d/%d/%d", d->year, d->month, d->day);
     return str_out;
 }
 
@@ -250,16 +250,18 @@ void submission_free(Submission *sub)
 
 Submission **get_subs_from_file(FILE *f, int *size)
 {
-    Submission **sub = malloc(sizeof(Submission *));
+    Submission **sub = malloc(100 * sizeof(Submission *));
     char line[MAX_LINE_SIZE]; // 10(int) + 16(time) + 100(group) + 100(id) + 100(name) + 100(problem) + 100(language) + 21(result max) + 7(state max) + 9*1(delimiter '\t') + 1(\n)
     int i = 0;
     while (fscanf(f, "%[^\n]%*c", line) != EOF) // MAX_LINE_SIZE - 1, remove white_space and new_line
     {
+        if ((i % 100) == 0)
+            sub = realloc(sub, (((i / 100) + 1) * 100) * sizeof(Submission *));
+
         int len = strlen(line);
         if (line[len - 1] == ' ')
             line[len - 1] = '\0'; // removes white space at the end of the string
 
-        sub = realloc(sub, (i + 1) * sizeof(Submission *));
         sub[i] = str_to_sub(line, FILE_DELIM, sub[i]);
         i++;
     }
@@ -290,10 +292,12 @@ void subs_println(const Submission **subs, const char *delim, int size)
 Submission **get_accepted_subs(Submission **subs, int size, int *out_size)
 {
     int n = 0;
-    Submission **accepted = malloc(sizeof(Submission *));
+    Submission **accepted = malloc(100 * sizeof(Submission *));
     for (int i = 0; i < size; i++)
     {
-        accepted = realloc(accepted, (n + 1) * sizeof(Submission *));
+        if ((i % 100) == 0)
+            accepted = realloc(accepted, (((i / 100) + 1) * 100) * sizeof(Submission *));
+
         if (subs[i]->result == Accepted)
             accepted[n++] = subs[i];
     }
@@ -301,34 +305,127 @@ Submission **get_accepted_subs(Submission **subs, int size, int *out_size)
     return accepted;
 }
 
+FILE *get_file_from_stdout_r()
+{
+    char filename[101];
+    scanf("%100s%*c", filename);
+    FILE *f = fopen(filename, "r");
+    return f;
+}
+
+// STATS command
+Submission **get_subs_by_problem(Submission **subs, int size, const char *problem, int *out_size)
+{
+    int n = 0;
+    Submission **selected = malloc(100 * sizeof(Submission *));
+    for (int i = 0; i < size; i++)
+    {
+        if ((i % 100) == 0)
+            selected = realloc(selected, (((i / 100) + 1) * 100) * sizeof(Submission *));
+
+        if (strcmp(subs[i]->problem, problem) == 0)
+            selected[n++] = subs[i];
+    }
+    *out_size = n;
+    return selected;
+}
+
+void get_problem_stats(Submission **subs, int size, int *problem_stats)
+{
+    for (int i = 0; i < size; i++)
+        problem_stats[subs[i]->result]++;
+}
+
+void print_stats(const int *stats, const char *problem, int total)
+{
+    int other = stats[Output_Limit_Exceeded] + stats[Invalid_Function] + stats[Invalid_Submission] + stats[Program_Size_Exceeded] + stats[Requires_Reevaluation] + stats[Evaluating];
+    printf("Problem: %s\n", problem);
+    printf("Total Submissions: %d\n", total);
+    printf("Accepted: %d\n", stats[Accepted]);
+    printf("Presentation Error: %d\n", stats[Presentation_Error]);
+    printf("Wrong Answer: %d\n", stats[Wrong_Answer]);
+    printf("Memory limit Exceeded: %d\n", stats[Memory_Limit_Exceeded]);
+    printf("Time Limit Exceeded: %d\n", stats[Time_Limit_Exceeded]);
+    printf("Run Time Error: %d\n", stats[Runtime_Error]);
+    printf("Compile Time Error: %d\n", stats[Compile_Time_Error]);
+    printf("Other Errors: %d\n", other);
+}
+
+void print_sub_stats(const char *problem, Submission **subs, int size)
+{
+    int problem_stats[13] = {0}; // initialize array elements at 0
+
+    int selected_size = 0;
+    Submission **selected = get_subs_by_problem(subs, size, problem, &selected_size);
+    get_problem_stats(selected, selected_size, problem_stats);
+    free(selected);
+    print_stats(problem_stats, problem, selected_size);
+}
+
+// UPDATE command
+
 // Test functions
+
+void interactive_command_line()
+{
+
+    FILE *f = get_file_from_stdout_r();
+
+    fscanf(f, "%*[^\n]%*c"); // Discard first line
+    int subs_size = 0;
+    Submission **submissions = get_subs_from_file(f, &subs_size);
+
+    char input[41];
+    char command[21];
+    char params[21];
+    while (scanf("%40[^\n]%*c", input) != EOF)
+    {
+        sscanf(input, "%s %s", command, params);
+        if (strcmp(command, COMMAND_STAT) == 0) // STATS <problem>
+            print_sub_stats(params, submissions, subs_size);
+        else if (strcmp(command, COMMAND_UPDATE) == 0)
+        {
+            // TODO
+        }
+        else if (strcmp(command, COMMAND_ORDER) == 0)
+        {
+            // TODO
+        }
+        else
+            printf("unrecognized command '%s'\n", command);
+    }
+
+    submissions_free(submissions, subs_size); // accepted is a subspace of submissions, so it's pointers have already been freed in the line prior
+    fclose(f);
+}
 
 void teste_leitura_simples()
 {
-    char filename[101];
-    scanf("%100s", filename);
-    FILE *f = fopen(filename, "r");
-    fscanf(f, "%*[^\n]%*c");
+    FILE *f = get_file_from_stdout_r();
+    fscanf(f, "%*[^\n]%*c"); // Discard first line
     int subs_size = 0;
     Submission **submissions = get_subs_from_file(f, &subs_size);
     int accepted_size = 0;
     Submission **accepted = get_accepted_subs(submissions, subs_size, &accepted_size);
     subs_println((const Submission **)accepted, PRINT_DELIM, accepted_size);
     submissions_free(submissions, subs_size);
-    free(accepted); // accepted is a subspace of submissions, so it's pointers have already been freed
+    free(accepted); // accepted is a subspace of submissions, so it's pointers have already been freed in the line prior
     fclose(f);
 }
 
 void teste_estatisticas()
 {
+    interactive_command_line();
 }
 
 void teste_atualizacao()
 {
+    interactive_command_line();
 }
 
 void teste_ordenacao()
 {
+    interactive_command_line();
 }
 
 void teste_ranking()
