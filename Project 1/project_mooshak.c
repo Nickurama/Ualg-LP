@@ -20,12 +20,19 @@ const char *PRINT_DELIM = ",";
 const char *COMMAND_STAT = "STATS";
 const char *COMMAND_UPDATE = "UPDATE";
 const char *COMMAND_ORDER = "ORDER";
+const char *COMMAND_ORDER_PARAM0 = "number_ascending";
+const char *COMMAND_ORDER_PARAM1 = "number_descending";
+const char *COMMAND_ORDER_PARAM2 = "id";
+const char *COMMAND_ORDER_PARAM3 = "problem";
 const char *COMMAND_PRINT = "PRINT";
+const char *COMMAND_PRINT_ALL = "*";
 const char *HEADER = "#	Time	Points	Group	Id	Team	Problem	Language	Result	State";
 #define TIME_FORMAT "%d/%d/%d %d:%d"
 #define TIME_FORMAT_PRINT "%d%d%d%d/%d%d/%d%d %d%d:%d%d"
 
 // Types
+
+typedef int (*Comparer)(const void *, const void *);
 
 typedef enum Result
 {
@@ -292,17 +299,17 @@ void submissions_free(Submission **subs, int size)
     free(subs);
 }
 
-void sub_println(const Submission *sub, const char *delim)
+void print_sub(const Submission *sub, const char *delim)
 {
     char buffer[MAX_LINE_SIZE];
     sub_to_str(buffer, sub, delim, 0);
     printf("%s\n", buffer);
 }
 
-void subs_println(const Submission **subs, const char *delim, int size)
+void print_subs(const Submission **subs, const char *delim, int size)
 {
     for (int i = 0; i < size; i++)
-        sub_println(subs[i], delim);
+        print_sub(subs[i], delim);
 }
 
 Submission **get_accepted_subs(Submission **subs, int size, int *out_size)
@@ -418,11 +425,38 @@ void file_update(FILE *f, Submission **subs, int size)
     rewind(f);
     fprintf(f, "%s\n", HEADER);
     char line[MAX_LINE_SIZE];
-    for (int i = 0; i < (size); i++) // size - 1
+    for (int i = 0; i < (size); i++)
     {
         sub_to_str(line, subs[i], FILE_DELIM, 1);
         fprintf(f, "%s\n", line);
     }
+}
+
+// SORT command
+
+int subs_number_cmp_asc(const Submission **s0, const Submission **s1)
+{
+    return (*s0)->number - (*s1)->number;
+}
+
+int subs_number_cmp_desc(const Submission **s0, const Submission **s1)
+{
+    return (*s1)->number - (*s0)->number;
+}
+
+int subs_id_cmp(const Submission **s0, const Submission **s1)
+{
+    int n = strcmp((*s0)->id, (*s1)->id);
+    if (n == 0)
+        n = subs_number_cmp_desc(s0, s1);
+    return n;
+}
+int subs_problem_cmp(const Submission **s0, const Submission **s1)
+{
+    int n = strcmp((*s0)->problem, (*s1)->problem);
+    if (n == 0)
+        n = subs_number_cmp_desc(s0, s1);
+    return n;
 }
 
 // Commands
@@ -446,21 +480,38 @@ int command_update(char *params, Submission **subs, int size)
     if (s != NULL)
     {
         update_sub(s, points);
-        sub_println(s, PRINT_DELIM);
+        print_sub(s, PRINT_DELIM);
     }
     else
         printf("Invalid Submission!\n");
     return 1;
 }
 
-void command_order(char *problem, Submission **subs, int size)
+void command_order(char *order, Submission **subs, int size)
 {
-    // TODO
+    if (strcmp(order, COMMAND_ORDER_PARAM0) == 0) // number ascending
+        qsort(subs, size, sizeof(Submission *), (Comparer)subs_number_cmp_asc);
+    else if (strcmp(order, COMMAND_ORDER_PARAM1) == 0) // number descending
+        qsort(subs, size, sizeof(Submission *), (Comparer)subs_number_cmp_desc);
+    else if (strcmp(order, COMMAND_ORDER_PARAM2) == 0) // id ascending
+        qsort(subs, size, sizeof(Submission *), (Comparer)subs_id_cmp);
+    else if (strcmp(order, COMMAND_ORDER_PARAM3) == 0) // problem ascending
+        qsort(subs, size, sizeof(Submission *), (Comparer)subs_problem_cmp);
+    else
+        printf("Invalid sorting order '%s'!\n", order);
 }
 
-void command_print(char *problem, Submission **subs, int size)
+void command_print(char *params, Submission **subs, int size)
 {
-    // TODO
+    if (strcmp(params, COMMAND_PRINT_ALL) == 0)
+        print_subs((const Submission **)subs, PRINT_DELIM, size);
+    else
+    {
+        int n = atoi(params);
+        if (n > size)
+            n = size;
+        print_subs((const Submission **)subs, PRINT_DELIM, n);
+    }
 }
 
 int command_input(Submission **subs, int size, char *command, char *params)
@@ -512,6 +563,7 @@ void interactive_command_line()
     // write updates
     if (has_updated)
     {
+        qsort(submissions, subs_size, sizeof(Submission *), (Comparer)subs_number_cmp_desc);
         file_change_mode(f, filename, "w");
         file_update(f, submissions, subs_size);
     }
@@ -529,7 +581,7 @@ void teste_leitura_simples()
     Submission **submissions = get_subs_from_file(f, &subs_size);
     int accepted_size = 0;
     Submission **accepted = get_accepted_subs(submissions, subs_size, &accepted_size);
-    subs_println((const Submission **)accepted, PRINT_DELIM, accepted_size);
+    print_subs((const Submission **)accepted, PRINT_DELIM, accepted_size);
     submissions_free(submissions, subs_size);
     free(accepted); // accepted is a subspace of submissions, so it's pointers have already been freed in the line prior
     fclose(f);

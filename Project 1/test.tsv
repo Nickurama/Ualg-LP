@@ -1,5 +1,5 @@
 #	Time	Points	Group	Id	Team	Problem	Language	Result	State
-836	2023/03/16 18:53	4	students	Grey_Rino_54806	Grey Rino 54806	G	C	Evaluating	final
+836	2023/03/16 18:53	69	students	Grey_Rino_54806	Grey Rino 54806	G	C	Accepted	final
 835	2023/03/16 18:50	50	students	Grey_Rino_54806	Grey Rino 54806	G	C	Memory Limit Exceeded	final
 834	2023/03/16 18:39	0	students	Grey_Rino_54806	Grey Rino 54806	G	C	Compile Time Error	pending
 833	2023/03/16 18:39	0	students	Grey_Rino_54806	Grey Rino 54806	G	C	Compile Time Error	pending
@@ -469,7 +469,7 @@
 369	2023/02/09 16:53	2	students	Babling_Cat_56008	Babling Cat 56008	H	C	Wrong Answer	pending
 368	2023/02/09 16:36	3	students	Black_Cow_55041	Black Cow 55041	G	C	Accepted	pending
 367	2023/02/09 16:17	0	students	Babling_Cat_56008	Babling Cat 56008	H	C	Wrong Answer	pending
-366	2023/02/09 16:16	20	students	Radiant_Snake_50543	Radiant Snake 50543	G	C	Accepted	final
+366	2023/02/09 16:16	6	students	Radiant_Snake_50543	Radiant Snake 50543	G	C	Accepted	final
 365	2023/02/09 16:15	3	students	Grey_Rino_54806	Grey Rino 54806	F	C	Accepted	pending
 364	2023/02/09 16:11	2	students	Black_Bunny_54856	Black Bunny 54856	H	C	Wrong Answer	pending
 363	2023/02/09 16:10	0	students	Babling_Cat_56008	Babling Cat 56008	H	C	Wrong Answer	pending
