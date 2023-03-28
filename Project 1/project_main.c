@@ -2,6 +2,6 @@
 
 int main()
 {
-    teste_estatisticas();
+    teste_ranking();
     return 0;
 }

@@ -9,6 +9,7 @@ const char *author = "Diogo Fonseca";
 
 const int DATE_STR_SIZE = 17;  // 16 + 1
 const int MAX_LINE_SIZE = 564; // number is hardcoded in get_subs_from_file()
+const int RANK_PRINT_NUMBER = 15;
 const char *STR_RESULTS[13] = {
     "Accepted", "Presentation Error", "Wrong Answer", "Output Limit Exceeded",
     "Memory Limit Exceeded", "Time Limit Exceeded", "Invalid Function", "Runtime Error",
@@ -81,6 +82,23 @@ typedef struct Submission
 
 } Submission;
 
+typedef struct Problem
+{
+    char *name;
+    int points;
+    int attempts;
+} Problem;
+
+typedef struct Participant
+{
+    char *description;
+    Submission **submissions;
+    int submissions_count;
+    Problem **problems;
+    int problems_count;
+    int total_points;
+} Participant;
+
 // Tools
 
 char **my_tokenizer(const char *s, const char *delim, int *out_token_count)
@@ -111,6 +129,56 @@ void free_tokens(char **tokens, int n)
     for (int i = 0; i < n; i++)
         free(tokens[i]);
     free(tokens);
+}
+
+int strs_contains(const char **strs, int size, const char *s)
+{
+    for (int i = 0; i < size; i++)
+        if (strcmp(strs[i], s) == 0)
+            return 1;
+    return 0;
+}
+
+int str_cmp(char **s0, char **s1)
+{
+    return strcmp(*s0, *s1);
+}
+
+void strs_free(char **strs, int size)
+{
+    for (int i = 0; i < size; i++)
+        free(strs[i]);
+    free(strs);
+}
+
+FILE *get_file_from_stdout(char *mode)
+{
+    char filename[101];
+    FILE *f;
+    do
+    {
+        scanf("%100s%*c", filename);
+        f = fopen(filename, mode);
+        if (f == NULL)
+            printf("file '%s' not found!\n", filename);
+    } while (f == NULL);
+    return f;
+}
+
+// name_out should be 101 characters long
+FILE *get_file_name_from_stdout(const char *mode, char *name_out)
+{
+    char filename[101];
+    FILE *f;
+    do
+    {
+        scanf("%100s%*c", filename);
+        f = fopen(filename, mode);
+        if (f == NULL)
+            printf("file '%s' not found!\n", filename);
+    } while (f == NULL);
+    strcpy(name_out, filename);
+    return f;
 }
 
 // Constructors / conversions / frees
@@ -190,27 +258,16 @@ Submission *submission_cnstrct(int number, Date *time, int points, char *group, 
 {
     Submission *sub = malloc(sizeof(Submission));
 
-    // misc
     sub->time = time;
-
-    // ints
     sub->number = number;
     sub->points = points;
     sub->result = result;
     sub->state = state;
-
-    // strings
-    sub->group = malloc((strlen(group) + 1) * sizeof(char));
-    sub->id = malloc((strlen(id) + 1) * sizeof(char));
-    sub->team = malloc((strlen(team) + 1) * sizeof(char));
-    sub->problem = malloc((strlen(problem) + 1) * sizeof(char));
-    sub->language = malloc((strlen(language) + 1) * sizeof(char));
-
-    strcpy(sub->group, group);
-    strcpy(sub->id, id);
-    strcpy(sub->team, team);
-    strcpy(sub->problem, problem);
-    strcpy(sub->language, language);
+    sub->group = strdup(group);
+    sub->id = strdup(id);
+    sub->team = strdup(team);
+    sub->problem = strdup(problem);
+    sub->language = strdup(language);
 
     return sub;
 }
@@ -267,6 +324,50 @@ void submission_free(Submission *sub)
     free(sub->problem);
     free(sub->language);
     free(sub);
+}
+
+Problem *problem_cnstrct(char *name, int points, int attempts)
+{
+    Problem *problem = malloc(sizeof(Problem));
+    problem->name = strdup(name);
+    problem->points = points;
+    problem->attempts = attempts;
+    return problem;
+}
+
+void problem_free(Problem *problem)
+{
+    free(problem->name);
+    free(problem);
+}
+
+Participant *participant_cnstrct(char *description, Submission **submissions, int submissions_count, Problem **problems, int problems_count, int total_points)
+{
+    Participant *par = malloc(sizeof(Participant));
+    par->description = strdup(description);
+    par->submissions = submissions;
+    par->submissions_count = submissions_count;
+    par->problems = problems;
+    par->problems_count = problems_count;
+    par->total_points = total_points;
+    return par;
+}
+
+void participant_free(Participant *participant)
+{
+    for (int i = 0; i < participant->problems_count; i++)
+        problem_free(participant->problems[i]);
+    free(participant->submissions);
+    free(participant->problems);
+    free(participant->description);
+    free(participant);
+}
+
+void participants_free(Participant **participants, int participants_size)
+{
+    for (int i = 0; i < participants_size; i++)
+        participant_free(participants[i]);
+    free(participants);
 }
 
 // Functions
@@ -328,41 +429,159 @@ Submission **get_accepted_subs(Submission **subs, int size, int *out_size)
     return accepted;
 }
 
-FILE *get_file_from_stdout(char *mode)
-{
-    char filename[101];
-    FILE *f;
-    do
-    {
-        scanf("%100s%*c", filename);
-        f = fopen(filename, mode);
-        if (f == NULL)
-            printf("file '%s' not found!\n", filename);
-    } while (f == NULL);
-    return f;
-}
-
-// name_out should be 101 characters long
-FILE *get_file_name_from_stdout(const char *mode, char *name_out)
-{
-    char filename[101];
-    FILE *f;
-    do
-    {
-        scanf("%100s%*c", filename);
-        f = fopen(filename, mode);
-        if (f == NULL)
-            printf("file '%s' not found!\n", filename);
-    } while (f == NULL);
-    strcpy(name_out, filename);
-    return f;
-}
-
 FILE *file_change_mode(FILE *f, char *filename, char *new_mode)
 {
     fclose(f);
     f = fopen(filename, new_mode);
     return f;
+}
+
+// functions for ranking
+char **submissions_get_unique_teams(Submission **subs, int size, int *out_size)
+{
+    char **unique_teams = malloc(100 * sizeof(char *));
+    int teams_size = 0;
+    for (int i = 0; i < size; i++)
+    {
+        if (teams_size % 100 == 0)
+            unique_teams = realloc(unique_teams, (((teams_size / 100) + 1) * 100) * sizeof(char *));
+
+        if (!strs_contains((const char **)unique_teams, teams_size, subs[i]->team))
+            unique_teams[teams_size++] = strdup(subs[i]->team);
+    }
+    *out_size = teams_size;
+    return unique_teams;
+}
+
+char **submissions_get_unique_problems(Submission **subs, int size, int *out_size)
+{
+    char **unique_problems = malloc(100 * sizeof(char *));
+    int problems_size = 0;
+    for (int i = 0; i < size; i++)
+    {
+        if (i % 100 == 0)
+            unique_problems = realloc(unique_problems, (((i / 100) + 1) * 100) * sizeof(char *));
+
+        if (!strs_contains((const char **)unique_problems, problems_size, subs[i]->problem))
+            unique_problems[problems_size++] = strdup(subs[i]->problem);
+    }
+    *out_size = problems_size;
+    return unique_problems;
+}
+
+Problem **problems_initializer(char **unique_problems, int unique_problems_count)
+{
+    Problem **problems = malloc(unique_problems_count * sizeof(Problem *));
+    for (int i = 0; i < unique_problems_count; i++)
+        problems[i] = problem_cnstrct(unique_problems[i], 0, 0);
+    return problems;
+}
+
+char *get_description_from_subs(Submission **subs, int subs_size, char *team)
+{
+    char *description;
+    for (int i = 0; i < subs_size; i++)
+    {
+        if (strcmp(subs[i]->team, team) == 0)
+        {
+            int len = strlen(subs[i]->team) + strlen(subs[i]->group) + 1;
+            description = malloc((len + 1) * sizeof(char));
+            sprintf(description, "%s %s", subs[i]->group, subs[i]->team);
+            return description;
+        }
+    }
+    assert(0);
+}
+
+Submission **participant_get_subs(Submission **subs, int subs_size, char *team, int *out_size)
+{
+    Submission **participant_subs = malloc(100 * sizeof(Submission *));
+    int participant_subs_size = 0;
+    for (int i = 0; i < subs_size; i++)
+    {
+        if (participant_subs_size % 100 == 0)
+            participant_subs = realloc(participant_subs, (((participant_subs_size / 100) + 1) * 100) * sizeof(Submission *));
+
+        if (strcmp(subs[i]->team, team) == 0)
+            participant_subs[participant_subs_size++] = subs[i];
+    }
+    *out_size = participant_subs_size;
+    return participant_subs;
+}
+
+void participant_update(Participant *participant)
+{
+    for (int i = 0; i < participant->submissions_count; i++)
+    {
+        for (int n = 0; n < participant->problems_count; n++)
+        {
+            if (strcmp(participant->problems[n]->name, participant->submissions[i]->problem) == 0)
+            {
+                participant->problems[n]->attempts++;
+                if (participant->submissions[i]->points > participant->problems[n]->points)
+                    participant->problems[n]->points = participant->submissions[i]->points;
+            }
+        }
+    }
+    for (int i = 0; i < participant->problems_count; i++)
+        participant->total_points += participant->problems[i]->points;
+}
+
+Participant *participant_initialize(Submission **subs, int subs_size, char *team, Problem **empty_problems, int problem_count)
+{
+    char *description = get_description_from_subs(subs, subs_size, team);
+    int participant_subs_size = 0;
+    Submission **participant_subs = participant_get_subs(subs, subs_size, team, &participant_subs_size);
+
+    Participant *participant = participant_cnstrct(description, participant_subs, participant_subs_size, empty_problems, problem_count, 0);
+    participant_update(participant);
+
+    return participant;
+}
+
+Participant **get_participants_from_subs(Submission **subs, int subs_size, int *participants_size)
+{
+    int unique_teams_count = 0;
+    char **unique_teams = submissions_get_unique_teams(subs, subs_size, &unique_teams_count);
+    int unique_problems_count = 0;
+    char **unique_problems = submissions_get_unique_problems(subs, subs_size, &unique_problems_count);
+    qsort(unique_problems, unique_problems_count, sizeof(char *), (Comparer)str_cmp);
+
+    Participant **participants = malloc(unique_teams_count * sizeof(Participant *));
+    // Problem **empty_problems = problems_initializer(unique_problems, unique_problems_count);
+    for (int i = 0; i < unique_teams_count; i++)
+        participants[i] = participant_initialize(subs, subs_size, unique_teams[i], problems_initializer(unique_problems, unique_problems_count), unique_problems_count);
+
+    strs_free(unique_teams, unique_teams_count);
+    strs_free(unique_problems, unique_problems_count);
+
+    *participants_size = unique_teams_count;
+    return participants;
+}
+
+void participant_println(Participant *participant)
+{
+    printf("%s\t", participant->description);
+    for (int i = 0; i < participant->problems_count; i++)
+        printf("%s:%d(%d)\t", participant->problems[i]->name, participant->problems[i]->points, participant->problems[i]->attempts);
+    printf("Total:%d\n", participant->total_points);
+}
+
+void participants_print(Participant **participants, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        printf("%d\t", i + 1);
+        participant_println(participants[i]);
+    }
+}
+
+int participants_cmp(Participant **p0, Participant **p1)
+{
+    int n;
+    if ((n = (*p1)->total_points - (*p0)->total_points) == 0)
+        n = (*p0)->submissions_count - (*p1)->submissions_count;
+    return n;
 }
 
 // STATS command
@@ -604,4 +823,20 @@ void teste_ordenacao()
 
 void teste_ranking()
 {
+    FILE *f = get_file_from_stdout("r");
+    fscanf(f, "%*[^\n]%*c"); // Discard first line
+    int subs_size = 0;
+    Submission **submissions = get_subs_from_file(f, &subs_size);
+    int parts_size = 0;
+    Participant **participants = get_participants_from_subs(submissions, subs_size, &parts_size);
+
+    qsort(participants, parts_size, sizeof(Participant *), (Comparer)participants_cmp);
+    int print_number = RANK_PRINT_NUMBER;
+    if (parts_size < RANK_PRINT_NUMBER)
+        print_number = parts_size;
+    participants_print(participants, print_number);
+
+    participants_free(participants, parts_size);
+    submissions_free(submissions, subs_size);
+    fclose(f);
 }
