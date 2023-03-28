@@ -230,7 +230,7 @@ Submission *str_to_sub(const char *str, const char *delim, Submission *out)
     return sub;
 }
 
-char *sub_to_str(char *str_out, const Submission *sub, const char *delim)
+char *sub_to_str(char *str_out, const Submission *sub, const char *delim, int is_print_format)
 {
     char date_str_buffer[DATE_STR_SIZE];
     date_to_str(date_str_buffer, sub->time);
@@ -238,11 +238,14 @@ char *sub_to_str(char *str_out, const Submission *sub, const char *delim)
     i = sprintf(str_out, "%d%s", sub->number, delim);
     i += sprintf(str_out + i, "%s%s", date_str_buffer, delim);
     i += sprintf(str_out + i, "%d%s", sub->points, delim);
-    i += sprintf(str_out + i, "%s%s", sub->group, delim);
+    if (is_print_format)
+        i += sprintf(str_out + i, "%s%s", sub->group, delim);
     i += sprintf(str_out + i, "%s%s", sub->id, delim);
-    i += sprintf(str_out + i, "%s%s", sub->team, delim);
+    if (is_print_format)
+        i += sprintf(str_out + i, "%s%s", sub->team, delim);
     i += sprintf(str_out + i, "%s%s", sub->problem, delim);
-    i += sprintf(str_out + i, "%s%s", sub->language, delim);
+    if (is_print_format)
+        i += sprintf(str_out + i, "%s%s", sub->language, delim);
     i += sprintf(str_out + i, "%s%s", result_to_str(sub->result), delim);
     i += sprintf(str_out + i, "%s", state_to_str(sub->state));
     return str_out;
@@ -292,7 +295,7 @@ void submissions_free(Submission **subs, int size)
 void sub_println(const Submission *sub, const char *delim)
 {
     char buffer[MAX_LINE_SIZE];
-    sub_to_str(buffer, sub, delim);
+    sub_to_str(buffer, sub, delim, 0);
     printf("%s\n", buffer);
 }
 
@@ -386,7 +389,7 @@ void print_stats(const int *stats, const char *problem, int total)
     printf("Accepted: %d\n", stats[Accepted]);
     printf("Presentation Error: %d\n", stats[Presentation_Error]);
     printf("Wrong Answer: %d\n", stats[Wrong_Answer]);
-    printf("Memory limit Exceeded: %d\n", stats[Memory_Limit_Exceeded]);
+    printf("Memory Limit Exceeded: %d\n", stats[Memory_Limit_Exceeded]);
     printf("Time Limit Exceeded: %d\n", stats[Time_Limit_Exceeded]);
     printf("Run Time Error: %d\n", stats[Runtime_Error]);
     printf("Compile Time Error: %d\n", stats[Compile_Time_Error]);
@@ -413,18 +416,13 @@ void update_sub(Submission *s, int points)
 void file_update(FILE *f, Submission **subs, int size)
 {
     rewind(f);
-    fprintf(f, "%s \n", HEADER);
+    fprintf(f, "%s\n", HEADER);
     char line[MAX_LINE_SIZE];
-    for (int i = 0; i < (size - 1); i++) // size - 1
+    for (int i = 0; i < (size); i++) // size - 1
     {
-        sub_to_str(line, subs[i], FILE_DELIM);
-        fprintf(f, "%s \n", line);
+        sub_to_str(line, subs[i], FILE_DELIM, 1);
+        fprintf(f, "%s\n", line);
     }
-
-    // last line (doesn't have a white space and \n)
-    sub_to_str(line, subs[size - 1], FILE_DELIM);
-    printf("line: %s.\n", line);
-    fprintf(f, "%s\n", line);
 }
 
 // Commands
@@ -465,6 +463,22 @@ void command_print(char *problem, Submission **subs, int size)
     // TODO
 }
 
+int command_input(Submission **subs, int size, char *command, char *params)
+{
+    int has_updated = 0;
+    if (strcmp(command, COMMAND_STAT) == 0) // STATS <problem>
+        command_stats(params, subs, size);
+    else if (strcmp(command, COMMAND_UPDATE) == 0) // UPDATE <number> <points>
+        has_updated = command_update(params, subs, size);
+    else if (strcmp(command, COMMAND_ORDER) == 0) // ORDER <criteria>
+        command_order(params, subs, size);
+    else if (strcmp(command, COMMAND_PRINT) == 0) // PRINT <n>
+        command_print(params, subs, size);
+    else
+        printf("unrecognized command '%s'\n", command);
+    return has_updated;
+}
+
 // Test functions
 
 void interactive_command_line()
@@ -481,19 +495,18 @@ void interactive_command_line()
     // command line
     int has_updated = 0;
     char input[41], command[21], params[21];
-    while (scanf("%40[^\n]%*c", input) != EOF)
+    int read;
+    while ((read = scanf("%40[^\n]%*c", input)) != EOF)
     {
-        sscanf(input, "%20s %20[^\n]%*c", command, params);
-        if (strcmp(command, COMMAND_STAT) == 0) // STATS <problem>
-            command_stats(params, submissions, subs_size);
-        else if (strcmp(command, COMMAND_UPDATE) == 0) // UPDATE <number> <points>
-            has_updated = command_update(params, submissions, subs_size);
-        else if (strcmp(command, COMMAND_ORDER) == 0) // ORDER <criteria>
-            command_order(params, submissions, subs_size);
-        else if (strcmp(command, COMMAND_PRINT) == 0) // PRINT <n>
-            command_print(params, submissions, subs_size);
+        if (read > 0)
+        {
+            sscanf(input, "%20s %20[^\n]%*c", command, params);
+            has_updated += command_input(submissions, subs_size, command, params);
+            if (has_updated > 1)
+                has_updated = 1;
+        }
         else
-            printf("unrecognized command '%s'\n", command);
+            scanf("%*c");
     }
 
     // write updates
