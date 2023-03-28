@@ -20,6 +20,7 @@ const char *PRINT_DELIM = ",";
 const char *COMMAND_STAT = "STATS";
 const char *COMMAND_UPDATE = "UPDATE";
 const char *COMMAND_ORDER = "ORDER";
+const char *COMMAND_PRINT = "PRINT";
 const char *HEADER = "#	Time	Points	Group	Id	Team	Problem	Language	Result	State";
 #define TIME_FORMAT "%d/%d/%d %d:%d"
 #define TIME_FORMAT_PRINT "%d%d%d%d/%d%d/%d%d %d%d:%d%d"
@@ -454,6 +455,16 @@ int command_update(char *params, Submission **subs, int size)
     return 1;
 }
 
+void command_order(char *problem, Submission **subs, int size)
+{
+    // TODO
+}
+
+void command_print(char *problem, Submission **subs, int size)
+{
+    // TODO
+}
+
 // Test functions
 
 void interactive_command_line()
@@ -477,10 +488,10 @@ void interactive_command_line()
             command_stats(params, submissions, subs_size);
         else if (strcmp(command, COMMAND_UPDATE) == 0) // UPDATE <number> <points>
             has_updated = command_update(params, submissions, subs_size);
-        else if (strcmp(command, COMMAND_ORDER) == 0)
-        {
-            // TODO
-        }
+        else if (strcmp(command, COMMAND_ORDER) == 0) // ORDER <criteria>
+            command_order(params, submissions, subs_size);
+        else if (strcmp(command, COMMAND_PRINT) == 0) // PRINT <n>
+            command_print(params, submissions, subs_size);
         else
             printf("unrecognized command '%s'\n", command);
     }
