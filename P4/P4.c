@@ -125,7 +125,7 @@ FILE *ask_for_file(const char *access)
         scanf("%99s", file_name);
         f = fopen(file_name, access);
         if (f == NULL)
-            printf("Error opening %s!\n", access);
+            printf("Error opening %s!\n", file_name);
     } while (f == NULL);
     return f;
 }

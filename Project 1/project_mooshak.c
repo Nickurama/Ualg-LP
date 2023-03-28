@@ -4,24 +4,25 @@
 #include <limits.h>
 #include <string.h>
 #include <math.h>
-
 #include "submission.h"
-
 const char *author = "Diogo Fonseca";
+
+const int DATE_STR_SIZE = 17;  // 16 + 1
+const int MAX_LINE_SIZE = 564; // number is hardcoded in get_subs_from_file()
 const char *STR_RESULTS[13] = {
     "Accepted", "Presentation Error", "Wrong Answer", "Output Limit Exceeded",
     "Memory Limit Exceeded", "Time Limit Exceeded", "Invalid Function", "Runtime Error",
     "Compile Time Error", "Invalid Submission", "Program Size Exceeded", "Requires Reevaluation",
     "Evaluating"};
 const char *STR_STATES[2] = {"pending", "final"};
-const int DATE_STR_SIZE = 17; // 16 + 1
-const char FILE_DELIM[1] = "\t";
-const char PRINT_DELIM[1] = ",";
-const int MAX_LINE_SIZE = 564; // number is hardcoded in get_subs_from_file()
+const char *FILE_DELIM = "\t";
+const char *PRINT_DELIM = ",";
 const char *COMMAND_STAT = "STATS";
 const char *COMMAND_UPDATE = "UPDATE";
 const char *COMMAND_ORDER = "ORDER";
-#define TIME_FORMAT = "%d/%d/%d %d:%d"
+const char *HEADER = "#	Time	Points	Group	Id	Team	Problem	Language	Result	State";
+#define TIME_FORMAT "%d/%d/%d %d:%d"
+#define TIME_FORMAT_PRINT "%d%d%d%d/%d%d/%d%d %d%d:%d%d"
 
 // Types
 
@@ -121,10 +122,10 @@ const char *result_to_str(Result r)
 }
 
 // state
-State str_to_state(const char *s)
+State str_to_state(const char *str)
 {
     for (int i = Pending; i <= Final; i++)
-        if (strcmp(s, STR_STATES[i]) == 0)
+        if (strcmp(str, STR_STATES[i]) == 0)
             return i;
     assert(0);
 }
@@ -146,17 +147,28 @@ Date *date_cnstrct(int year, int month, int day, int hour, int minute)
     return date;
 }
 
-Date *str_to_date(const char *str) // Format: YYYY/MM/DD HH:MM
+Date *str_to_date(const char *str)
 {
     int y, mo, d, h, m;
-    sscanf(str, "%d/%d/%d %d:%d", &y, &mo, &d, &h, &m);
+    sscanf(str, TIME_FORMAT, &y, &mo, &d, &h, &m);
     Date *date = date_cnstrct(y, mo, d, h, m);
     return date;
 }
 
-char *date_to_str(char *str_out, Date *d) // Format: YYYY/MM/DD HH:MM
+int get_digit(int n, int digit)
 {
-    sprintf(str_out, "%d/%d/%d %d:%d", d->year, d->month, d->day, d->hour, d->minute);
+    int x = n / (int)(pow(10, digit));
+    return x % 10;
+}
+
+char *date_to_str(char *str_out, Date *d)
+{
+    sprintf(str_out, TIME_FORMAT_PRINT,
+            get_digit(d->year, 3), get_digit(d->year, 2), get_digit(d->year, 1), get_digit(d->year, 0),
+            get_digit(d->month, 1), get_digit(d->month, 0),
+            get_digit(d->day, 1), get_digit(d->day, 0),
+            get_digit(d->hour, 1), get_digit(d->hour, 0),
+            get_digit(d->minute, 1), get_digit(d->minute, 0));
     return str_out;
 }
 
@@ -220,7 +232,7 @@ Submission *str_to_sub(const char *str, const char *delim, Submission *out)
 char *sub_to_str(char *str_out, const Submission *sub, const char *delim)
 {
     char date_str_buffer[DATE_STR_SIZE];
-    date_to_str_no_hours(date_str_buffer, sub->time);
+    date_to_str(date_str_buffer, sub->time);
     int i;
     i = sprintf(str_out, "%d%s", sub->number, delim);
     i += sprintf(str_out + i, "%s%s", date_str_buffer, delim);
@@ -305,11 +317,40 @@ Submission **get_accepted_subs(Submission **subs, int size, int *out_size)
     return accepted;
 }
 
-FILE *get_file_from_stdout_r()
+FILE *get_file_from_stdout(char *mode)
 {
     char filename[101];
-    scanf("%100s%*c", filename);
-    FILE *f = fopen(filename, "r");
+    FILE *f;
+    do
+    {
+        scanf("%100s%*c", filename);
+        f = fopen(filename, mode);
+        if (f == NULL)
+            printf("file '%s' not found!\n", filename);
+    } while (f == NULL);
+    return f;
+}
+
+// name_out should be 101 characters long
+FILE *get_file_name_from_stdout(const char *mode, char *name_out)
+{
+    char filename[101];
+    FILE *f;
+    do
+    {
+        scanf("%100s%*c", filename);
+        f = fopen(filename, mode);
+        if (f == NULL)
+            printf("file '%s' not found!\n", filename);
+    } while (f == NULL);
+    strcpy(name_out, filename);
+    return f;
+}
+
+FILE *file_change_mode(FILE *f, char *filename, char *new_mode)
+{
+    fclose(f);
+    f = fopen(filename, new_mode);
     return f;
 }
 
@@ -351,7 +392,43 @@ void print_stats(const int *stats, const char *problem, int total)
     printf("Other Errors: %d\n", other);
 }
 
-void print_sub_stats(const char *problem, Submission **subs, int size)
+// UPDATE command
+
+Submission *get_sub_by_number(Submission **subs, int size, int number)
+{
+    for (int i = 0; i < size; i++)
+        if (subs[i]->number == number)
+            return subs[i];
+    return NULL;
+}
+
+void update_sub(Submission *s, int points)
+{
+    s->points = points;
+    s->result = Accepted;
+    s->state = Final;
+}
+
+void file_update(FILE *f, Submission **subs, int size)
+{
+    rewind(f);
+    fprintf(f, "%s \n", HEADER);
+    char line[MAX_LINE_SIZE];
+    for (int i = 0; i < (size - 1); i++) // size - 1
+    {
+        sub_to_str(line, subs[i], FILE_DELIM);
+        fprintf(f, "%s \n", line);
+    }
+
+    // last line (doesn't have a white space and \n)
+    sub_to_str(line, subs[size - 1], FILE_DELIM);
+    printf("line: %s.\n", line);
+    fprintf(f, "%s\n", line);
+}
+
+// Commands
+
+void command_stats(char *problem, Submission **subs, int size)
 {
     int problem_stats[13] = {0}; // initialize array elements at 0
 
@@ -362,31 +439,44 @@ void print_sub_stats(const char *problem, Submission **subs, int size)
     print_stats(problem_stats, problem, selected_size);
 }
 
-// UPDATE command
+int command_update(char *params, Submission **subs, int size)
+{
+    int number, points;
+    sscanf(params, "%d %d", &number, &points);
+    Submission *s = get_sub_by_number(subs, size, number);
+    if (s != NULL)
+    {
+        update_sub(s, points);
+        sub_println(s, PRINT_DELIM);
+    }
+    else
+        printf("Invalid Submission!\n");
+    return 1;
+}
 
 // Test functions
 
 void interactive_command_line()
 {
+    // get file
+    char filename[101];
+    FILE *f = get_file_name_from_stdout("r", filename);
 
-    FILE *f = get_file_from_stdout_r();
-
+    // get submissions
     fscanf(f, "%*[^\n]%*c"); // Discard first line
     int subs_size = 0;
     Submission **submissions = get_subs_from_file(f, &subs_size);
 
-    char input[41];
-    char command[21];
-    char params[21];
+    // command line
+    int has_updated = 0;
+    char input[41], command[21], params[21];
     while (scanf("%40[^\n]%*c", input) != EOF)
     {
-        sscanf(input, "%s %s", command, params);
+        sscanf(input, "%20s %20[^\n]%*c", command, params);
         if (strcmp(command, COMMAND_STAT) == 0) // STATS <problem>
-            print_sub_stats(params, submissions, subs_size);
-        else if (strcmp(command, COMMAND_UPDATE) == 0)
-        {
-            // TODO
-        }
+            command_stats(params, submissions, subs_size);
+        else if (strcmp(command, COMMAND_UPDATE) == 0) // UPDATE <number> <points>
+            has_updated = command_update(params, submissions, subs_size);
         else if (strcmp(command, COMMAND_ORDER) == 0)
         {
             // TODO
@@ -395,13 +485,21 @@ void interactive_command_line()
             printf("unrecognized command '%s'\n", command);
     }
 
-    submissions_free(submissions, subs_size); // accepted is a subspace of submissions, so it's pointers have already been freed in the line prior
+    // write updates
+    if (has_updated)
+    {
+        file_change_mode(f, filename, "w");
+        file_update(f, submissions, subs_size);
+    }
+
+    // cleanup
+    submissions_free(submissions, subs_size);
     fclose(f);
 }
 
 void teste_leitura_simples()
 {
-    FILE *f = get_file_from_stdout_r();
+    FILE *f = get_file_from_stdout("r");
     fscanf(f, "%*[^\n]%*c"); // Discard first line
     int subs_size = 0;
     Submission **submissions = get_subs_from_file(f, &subs_size);
@@ -431,12 +529,3 @@ void teste_ordenacao()
 void teste_ranking()
 {
 }
-
-/*
-Dúvidas:
-    -delimite? ou dar print/fazer só para aquele caso específico do \t?
-    -realloc on loop?
-    -no white space on last line
-    -free on subspace (free(accepted))
-    -deep copy no constructor?
-*/
