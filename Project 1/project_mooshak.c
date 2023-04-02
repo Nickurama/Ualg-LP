@@ -7,8 +7,9 @@
 #include "submission.h"
 const char *author = "Diogo Fonseca";
 
-const int DATE_STR_SIZE = 17;  // 16 + 1
-const int MAX_LINE_SIZE = 564; // number is hardcoded in get_subs_from_file()
+const int DATE_STR_SIZE = 17; // 16 + 1
+// 10(int) + 16(time) + 10(int points) + 100(group) + 100(id) + 100(name) + 100(problem) + 100(language) + 21(result max) + 7(state max) + 9*1(delimiter '\t') + 1(\n)
+const int MAX_LINE_SIZE = 574; // number is hardcoded in get_subs_from_file()
 const int RANK_PRINT_NUMBER = 15;
 const char *STR_RESULTS[13] = {
     "Accepted", "Presentation Error", "Wrong Answer", "Output Limit Exceeded",
@@ -375,7 +376,7 @@ void participants_free(Participant **participants, int participants_size)
 Submission **get_subs_from_file(FILE *f, int *size)
 {
     Submission **sub = malloc(100 * sizeof(Submission *));
-    char line[MAX_LINE_SIZE]; // 10(int) + 16(time) + 100(group) + 100(id) + 100(name) + 100(problem) + 100(language) + 21(result max) + 7(state max) + 9*1(delimiter '\t') + 1(\n)
+    char line[MAX_LINE_SIZE];
     int i = 0;
     while (fscanf(f, "%[^\n]%*c", line) != EOF) // MAX_LINE_SIZE - 1, remove white_space and new_line
     {
