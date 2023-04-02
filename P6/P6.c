@@ -49,6 +49,67 @@ void lista_writeln_file(FILE *f, Lista *l, const char *delimiter)
 
 // Problem B
 
+double lista_max(Lista *l)
+{
+    assert(!lista_vazia(l));
+
+    double max_value = l->value;
+    while (!lista_vazia(l))
+    {
+        if (l->value > max_value)
+            max_value = l->value;
+        l = l->next;
+    }
+    return max_value;
+}
+
+double lista_sum(Lista *l)
+{
+    double sum = 0;
+    while (!lista_vazia(l))
+    {
+        sum += l->value;
+        l = l->next;
+    }
+    return sum;
+}
+
+Lista *lista_filtra_positivos(Lista *l)
+{
+    Lista *positive = lista();
+    while (!lista_vazia(l))
+    {
+        if (l->value > 0)
+            positive = lista_insere_fim(positive, l->value);
+        l = l->next;
+    }
+
+    return positive;
+}
+
+Lista *lista_inverte(Lista *l)
+{
+    Lista *inverted = lista();
+    Lista *l_start = l;
+
+    while (!lista_vazia(l))
+    {
+        inverted = lista_insere(inverted, l->value);
+        l = l->next;
+    }
+
+    l = l_start;
+    while (!lista_vazia(l))
+    {
+        l->value = inverted->value;
+        l = l->next;
+        inverted = inverted->next;
+    }
+
+    lista_free(inverted);
+    return l_start;
+}
+
 // Test Functions
 
 void testA()
@@ -65,6 +126,15 @@ void testA()
 }
 void testB()
 {
+    Lista *l = lista_get_doubles();
+    printf("max value: %.2lf\n", lista_max(l));
+    printf("sum of elements: %.2lf\n", lista_sum(l));
+    printf("positive values: ");
+    Lista *positives = lista_filtra_positivos(l);
+    lista_println(positives);
+    printf("inverted list: ");
+    l = lista_inverte(l);
+    lista_println(l);
 }
 void testC()
 {
