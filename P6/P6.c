@@ -110,6 +110,80 @@ Lista *lista_inverte(Lista *l)
     return l_start;
 }
 
+// Problem C
+
+typedef double (*DoubleOperator)(double);
+typedef double (*DoubleBinaryOperator)(double, double);
+typedef int (*DoublePredicate)(double);
+
+Lista *map(Lista *l, DoubleOperator op)
+{
+    Lista *start = l;
+    while (!lista_vazia(l))
+    {
+        l->value = op(l->value);
+        l = l->next;
+    }
+    return start;
+}
+
+int all(Lista *l, DoublePredicate p)
+{
+    while (!lista_vazia(l))
+    {
+        if (p(l->value) == 0)
+            return 0;
+        l = l->next;
+    }
+    return 1;
+}
+
+int any(Lista *l, DoublePredicate p)
+{
+    while (!lista_vazia(l))
+    {
+        if (p(l->value) == 1)
+            return 1;
+        l = l->next;
+    }
+    return 0;
+}
+
+int count_if(Lista *l, DoublePredicate p)
+{
+    int count = 0;
+    while (!lista_vazia(l))
+    {
+        if (p(l->value) == 1)
+            count++;
+        l = l->next;
+    }
+    return count;
+}
+
+Lista *filter(Lista *l, DoublePredicate p)
+{
+    Lista *new_l = lista();
+    while (!lista_vazia(l))
+    {
+        if (p(l->value) == 1)
+            new_l = lista_insere_fim(new_l, l->value);
+        l = l->next;
+    }
+    return new_l;
+}
+
+double find_first(Lista *l, DoublePredicate p)
+{
+    while (!lista_vazia(l))
+    {
+        if (p(l->value) == 1)
+            return l->value;
+        l = l->next;
+    }
+    return -1;
+}
+
 // Test Functions
 
 void testA()
