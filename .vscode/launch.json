@@ -8,8 +8,10 @@
             "args": [],
             "stopAtEntry": false,
             "externalConsole": true,
-            "cwd": "c:/Users/rokdo/Desktop/Uni Code/LP Projects/Project 1",
-            "program": "c:/Users/rokdo/Desktop/Uni Code/LP Projects/Project 1/a",
+            "cwd": "${fileDirname}",
+            "program": "${fileDirname}/a.exe",
+            //"cwd": "c:/Users/rokdo/Desktop/Uni Code/LP Projects/P6",
+            //"program": "c:/Users/rokdo/Desktop/Uni Code/LP Projects/P6/a",
             "MIMode": "gdb",
             "miDebuggerPath": "gdb",
             "setupCommands": [
