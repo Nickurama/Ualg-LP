@@ -32,7 +32,7 @@ class Intersection
     private boolean hasPassedIntersection(float pos)
     {
         boolean result = false;
-        if (pos > windowWidth / 16 || pos < - windowWidth / 16)
+        if (pos > windowWidth / 4 || pos < - windowWidth / 4)
         {
             result = true;
         }
