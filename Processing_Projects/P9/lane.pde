@@ -95,6 +95,8 @@ class Lane
     }
     
     public float carPos() { return car.getX(); }
+    public boolean isRed() { return trafficLight.isRed(); }
+    public boolean isGreen() { return trafficLight.isGreen(); }
     
     // private void drawLane()
     // {

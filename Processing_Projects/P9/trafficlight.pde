@@ -86,9 +86,10 @@ class TrafficLight
         if (!greenLight.isON())
         {
             redLight.turnOFF();
-            timerTicks = TRANSITION_TIME_TICKS;
-            yellowLight.turnON();
-            nextLight = greenLight;
+            //timerTicks = TRANSITION_TIME_TICKS;
+            //yellowLight.turnON();
+            //nextLight = greenLight;
+            greenLight.turnON();
         }
     }
     

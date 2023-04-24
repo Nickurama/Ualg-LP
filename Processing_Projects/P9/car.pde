@@ -69,8 +69,8 @@ class Car
     
     private void move()
     {
-        this.x = this.x + this.speed * cos(radians(rotationAngle));
-        this.y = this.y + this.speed * sin(radians(rotationAngle));
+        this.x += this.speed * cos(radians(rotationAngle));
+        this.y += this.speed * sin(radians(rotationAngle));
         accelerate();
     }
     

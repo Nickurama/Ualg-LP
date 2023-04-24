@@ -39,7 +39,9 @@ class Intersection
         return result;
     }
     
-    private void update()
+    //TODO: hasPassedIntersection is poorly implemented
+    //TODO: green light should not be ON at the same time as yellow light
+    private void update() //!REDO
     {
         if ((eastLane.isStalled() || westLane.isStalled()) && hasPassedIntersection(northLane.carPos()) && hasPassedIntersection(southLane.carPos()))
         {
