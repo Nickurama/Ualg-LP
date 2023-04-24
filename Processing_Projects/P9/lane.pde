@@ -55,7 +55,7 @@ class Lane
         }
         
         //check if light is green again
-        if (!car.isMoving() && trafficLight.isGreen())
+        if (isStalled() && trafficLight.isGreen())
         {
             car.startMoving();
         }
@@ -83,6 +83,18 @@ class Lane
     {
         trafficLight.switchRed();
     }
+    
+    public boolean isStalled()
+    {
+        boolean result = false;
+        if (!car.isMoving())
+        {
+            result = true;
+        }
+        return result;
+    }
+    
+    public float carPos() { return car.getX(); }
     
     // private void drawLane()
     // {

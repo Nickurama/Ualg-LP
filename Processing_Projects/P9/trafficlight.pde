@@ -83,18 +83,24 @@ class TrafficLight
     
     public void switchGreen()
     {
-        redLight.turnOFF();
-        timerTicks = TRANSITION_TIME_TICKS;
-        yellowLight.turnON();
-        nextLight = greenLight;
+        if (!greenLight.isON())
+        {
+            redLight.turnOFF();
+            timerTicks = TRANSITION_TIME_TICKS;
+            yellowLight.turnON();
+            nextLight = greenLight;
+        }
     }
     
     public void switchRed()
     {
-        greenLight.turnOFF();
-        timerTicks = TRANSITION_TIME_TICKS;
-        yellowLight.turnON();
-        nextLight = redLight;
+        if (!redLight.isON())
+        {
+            greenLight.turnOFF();
+            timerTicks = TRANSITION_TIME_TICKS;
+            yellowLight.turnON();
+            nextLight = redLight;
+        }
     }
     
     public float getX() { return this.x; }
