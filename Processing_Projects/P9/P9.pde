@@ -1,11 +1,10 @@
 final color DARK_RED = color(128, 0, 0);
 final color DARK_GREEN = color(0, 128, 0);
 
-final int W_WIDTH = 720;
-final int W_HEIGHT = 720;
+final int W_WIDTH = 1080;
+final int W_HEIGHT = 1080;
 
-private TrafficLight tl;
-private Car car;
+private Lane lane;
 
 void settings()
 {
@@ -14,21 +13,15 @@ void settings()
 
 void setup()
 {
-    tl = new TrafficLight(300, 300, 100, 0);
-    tl.switchGreen();
-    car = new Car(450, 450, 100, 45, DARK_RED, 0, 5);
+    lane = new Lane(540, 540, W_WIDTH, 0);
+    // tl = new TrafficLight(300, 300, 100, 0);
+    // tl.switchGreen();
+    // car = new Car(450, 450, 100, 45, DARK_RED, 0, 5, 0.05);
 }
 
 void draw()
 {
     background(DARK_GREEN);
     
-    if (keyPressed)
-    {
-        tl.toggle();
-        car.toggleMovement();
-    }
-    
-    tl.draw();
-    car.draw();
+    lane.draw();
 }

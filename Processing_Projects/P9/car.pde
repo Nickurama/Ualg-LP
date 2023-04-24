@@ -1,7 +1,6 @@
 class Car
 {
     final private color BLACK = color(0, 0, 0);
-    final private float ACCEL = 0.05;
     
     private float x;
     private float y;
@@ -12,10 +11,11 @@ class Car
     
     private float speed;
     private float maxSpeed;
+    private float acceleration;
     
     private boolean isMoving;
     
-    public Car(float startingX, float startingY, float width, float rotationAngle, color drawColor, float startingSpeed, float maxSpeed)
+    public Car(float startingX, float startingY, float width, float rotationAngle, color drawColor, float startingSpeed, float maxSpeed, float acceleration)
     {
         this.x = startingX;
         this.y = startingY;
@@ -26,8 +26,9 @@ class Car
         
         this.speed = startingSpeed;
         this.maxSpeed = maxSpeed;
+        this.acceleration = acceleration;
         
-        isMoving = false;
+        isMoving = true;
     }
     
     public void toggleMovement()
@@ -58,7 +59,7 @@ class Car
     {
         if (this.speed < maxSpeed)
         {
-            this.speed = this.speed + ACCEL;
+            this.speed = this.speed + acceleration;
             if (this.speed > maxSpeed)
             {
                 this.speed = maxSpeed;
@@ -85,6 +86,7 @@ class Car
     public void draw()
     {
         update();
+        
         pushMatrix();
         rectMode(CENTER);
         translate(x, y);
@@ -97,16 +99,16 @@ class Car
     private void drawBody()
     {
         fill(drawColor);
-        rect( -(width * 0.4) / 2, 0, width * 0.6, height);
-        rect((width * 0.6) / 2, 0,width * 0.4, height);
+        rect( -(this.width * 0.4) / 2, 0, this.width * 0.6, this.height);
+        rect((this.width * 0.6) / 2, 0, this.width * 0.4, this.height);
     }
     
     private void drawWheels()
     {
         fill(BLACK);
-        rect( -(width / 2) + width / 6, -(height / 2), width / 4, height / 4);
-        rect((width / 2) - width / 6, -(height / 2), width / 4, height / 4);
-        rect( -(width / 2) + width / 6,(height / 2), width / 4, height / 4);
-        rect((width / 2) - width / 6,(height / 2), width / 4, height / 4);
+        rect( -(this.width / 2) + this.width / 6, -(this.height / 2), this.width / 4, this.height / 4);
+        rect((this.width / 2) - this.width / 6, -(this.height / 2), this.width / 4, this.height / 4);
+        rect( -(this.width / 2) + this.width / 6,(this.height / 2), this.width / 4, this.height / 4);
+        rect((this.width / 2) - this.width / 6,(this.height / 2), this.width / 4, this.height / 4);
     }
 }

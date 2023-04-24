@@ -26,7 +26,7 @@ class TrafficLight
         this.y = y;
         this.width = width;
         this.height = width * 3;
-        this.rotationAngle = -rotationAngle;
+        this.rotationAngle = -rotationAngle + 90;
         timerTicks = 0;
         
         // redLight = new Light(this.x + cos(radians(rotationAngle)) * (width / 2) + (height / 6 * 1) * cos(radians(rotationAngle)), this.y + sin(radians(rotationAngle)) * (height / 6 * 1) + sin(radians(rotationAngle)) * (width / 2), width / 2, RED);
