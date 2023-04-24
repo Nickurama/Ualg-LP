@@ -1,13 +1,13 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "UwU Testing",
-      "type": "shell",
-      "command": "./scripts/test.sh",
-      "windows": {
-        "command": "C:/Users/rokdo/Desktop/Processing/processing-4.2/processing-java.exe --sketch=${fileDirname} --run"
-      }
-    }
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "UwU Testing",
+            "type": "shell",
+            "command": "./scripts/test.sh",
+            "windows": {
+                "command": "C:/Users/rokdo/Desktop/Processing/processing-4.2/processing-java.exe --sketch=${fileDirname} --run"
+            }
+        }
+    ]
 }
