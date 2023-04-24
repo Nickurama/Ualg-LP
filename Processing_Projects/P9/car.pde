@@ -111,4 +111,9 @@ class Car
         rect( -(this.width / 2) + this.width / 6,(this.height / 2), this.width / 4, this.height / 4);
         rect((this.width / 2) - this.width / 6,(this.height / 2), this.width / 4, this.height / 4);
     }
+    
+    public float getX() { return this.x; }
+    public float getY() { return this.y; }
+    public float getWidth() { return this.width; }
+    public boolean isMoving() { return this.isMoving; }
 }

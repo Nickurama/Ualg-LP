@@ -1,9 +1,11 @@
 class Lane
 {
-    final private float CAR_MAX_SPEED = 5;
-    final private float CAR_ACCEL = 0.025;
-    final private float CAR_WIDTH = 100;
+    final private color DARK_GREY = color(64, 64, 64);
+    final private color BLACK = color(0, 0, 0);
     
+    final private float CAR_MAX_SPEED = 6;
+    final private float CAR_MIN_SPEED = 2;
+    final private float CAR_ACCEL = 0.025;
     
     private float x;
     private float y;
@@ -31,13 +33,32 @@ class Lane
         int randomG = int(random(256));
         int randomB = int(random(256));
         color randomColor = color(randomR, randomG, randomB);
-        float randomMaxSpeed = random(1, 8);
-        return new Car( -(length / 2), 0, CAR_WIDTH, 0, randomColor, randomMaxSpeed, randomMaxSpeed, CAR_ACCEL);
+        float randomMaxSpeed = random(CAR_MIN_SPEED, CAR_MAX_SPEED);
+        return new Car( -(length / 2), 0, length / 16, 0, randomColor, randomMaxSpeed, randomMaxSpeed, CAR_ACCEL);
     }
     
     private void update()
     {
+        //check if car reached end
+        if (car.getX() > length / 2)
+        {
+            car = spawnRandomCar();
+        }
         
+        //check if car has reached the traffic light
+        if (car.getX() < trafficLight.getX() && car.getX() > trafficLight.getX() - car.getWidth())
+        {
+            if (trafficLight.isRed() || trafficLight.isYellow())
+            {
+                car.stopMoving();
+            }
+        }
+        
+        //check if light is green again
+        if (!car.isMoving() && trafficLight.isGreen())
+        {
+            car.startMoving();
+        }
     }
     
     public void draw()
@@ -47,15 +68,28 @@ class Lane
         pushMatrix();
         translate(x, y);
         rotate(radians(rotationAngle));
-        drawLane();
+        // drawLane();
         car.draw();
         trafficLight.draw();
         popMatrix();
     }
     
-    private void drawLane()
+    public void toggleGreen()
     {
-        rectMode(CENTER);
-        rect(0, 0, length, width);
+        trafficLight.switchGreen();
     }
+    
+    public void toggleRed()
+    {
+        trafficLight.switchRed();
+    }
+    
+    // private void drawLane()
+    // {
+    //     rectMode(CENTER);
+    //     fill(DARK_GREY);
+    //     noStroke();
+    //     rect(0, 0, length, width);
+    //     stroke(BLACK);
+// }
 }

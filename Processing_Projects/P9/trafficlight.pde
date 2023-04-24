@@ -14,11 +14,11 @@ class TrafficLight
     private int timerTicks;
     private Light nextLight;
     
-    public float x;
-    public float y;
-    public float width;
-    public float height;
-    public float rotationAngle;
+    private float x;
+    private float y;
+    private float width;
+    private float height;
+    private float rotationAngle;
     
     public TrafficLight(float x, float y, float width, float rotationAngle)
     {
@@ -96,4 +96,10 @@ class TrafficLight
         yellowLight.turnON();
         nextLight = redLight;
     }
+    
+    public float getX() { return this.x; }
+    public float getY() { return this.y; }
+    public boolean isGreen() { return greenLight.isON(); }
+    public boolean isYellow() { return yellowLight.isON(); }
+    public boolean isRed() { return redLight.isON(); }
 }
