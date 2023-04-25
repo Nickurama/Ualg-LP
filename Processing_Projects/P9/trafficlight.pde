@@ -83,7 +83,7 @@ class TrafficLight
     
     public void switchGreen()
     {
-        if (!greenLight.isON())
+        if (!greenLight.isON() && !yellowLight.isON())
         {
             redLight.turnOFF();
             //timerTicks = TRANSITION_TIME_TICKS;
@@ -95,7 +95,7 @@ class TrafficLight
     
     public void switchRed()
     {
-        if (!redLight.isON())
+        if (!redLight.isON() && !yellowLight.isON())
         {
             greenLight.turnOFF();
             timerTicks = TRANSITION_TIME_TICKS;

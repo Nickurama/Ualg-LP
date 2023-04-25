@@ -1,6 +1,7 @@
 class Intersection
 {
-    final private int COOLDOWN_TIME_TICKS = 300;
+    final private int COOLDOWN_TIME_TICKS = 180;
+    final private int ALL_RED_TIME = 120;
     
     final private color DARK_GREEN = color(0, 128, 0);
     final private color DARK_GREY = color(64, 64, 64);
@@ -15,6 +16,8 @@ class Intersection
     private int windowHeight;
     
     private int cooldownTicks;
+    private int allRedTime;
+    private boolean isNS;
     
     public Intersection(int windowWidth, int windowHeight)
     {
@@ -26,54 +29,94 @@ class Intersection
         northLane = new Lane(windowWidth / 2 + windowWidth / 32, windowHeight / 2, windowHeight, 90);
         southLane = new Lane(windowWidth / 2 - windowWidth / 32, windowHeight / 2, windowHeight, 270);
         
-        cooldownTicks = 0;
+        cooldownTicks = COOLDOWN_TIME_TICKS;
+        allRedTime = ALL_RED_TIME;
+        isNS = true;
+        turnAllRed();
+        northLane.toggleGreen();
+        southLane.toggleGreen();
     }
     
-    private boolean hasPassedIntersection(float pos)
+    private boolean isCarInIntersection(float carPos, float trafficLightPos)
     {
-        boolean result = false;
-        if (pos > windowWidth / 4 || pos < - windowWidth / 4)
+        boolean result = true;
+        if (carPos < trafficLightPos || carPos > - trafficLightPos)
         {
-            result = true;
+            result = false;
         }
         return result;
     }
     
-    //TODO: hasPassedIntersection is poorly implemented
-    //TODO: green light should not be ON at the same time as yellow light
-    private void update() //!REDO
+    private void turnAllRed()
     {
-        if ((eastLane.isStalled() || westLane.isStalled()) && hasPassedIntersection(northLane.carPos()) && hasPassedIntersection(southLane.carPos()))
+        northLane.toggleRed();
+        southLane.toggleRed();
+        eastLane.toggleRed();
+        westLane.toggleRed();
+    }
+    
+    private void switchNS()
+    {
+        cooldownTicks = COOLDOWN_TIME_TICKS;
+        allRedTime = ALL_RED_TIME;
+        northLane.toggleGreen();
+        southLane.toggleGreen();
+        isNS = true;
+    }
+    
+    private void switchEW()
+    {
+        cooldownTicks = COOLDOWN_TIME_TICKS;
+        allRedTime = ALL_RED_TIME;
+        eastLane.toggleGreen();
+        westLane.toggleGreen();
+        isNS = false;
+    }
+    
+    private void switchLanes()
+    {
+        turnAllRed();
+        if (allRedTime == 0)
         {
-            if (cooldownTicks == 0)
+            if (isNS)
             {
-                cooldownTicks = COOLDOWN_TIME_TICKS;
-                eastLane.toggleGreen();
-                westLane.toggleGreen();
-                northLane.toggleRed();
-                southLane.toggleRed();
+                if (!isCarInIntersection(northLane.carPos(), northLane.trafficLightPos()) && 
+                    !isCarInIntersection(southLane.carPos(), southLane.trafficLightPos()) && 
+                    northLane.isRed() && southLane.isRed())
+                {
+                    switchEW();
+                }
+            }
+            else if (!isNS)
+            {
+                if (!isCarInIntersection(eastLane.carPos(), eastLane.trafficLightPos()) && 
+                    !isCarInIntersection(westLane.carPos(), westLane.trafficLightPos()) && 
+                    eastLane.isRed() && westLane.isRed())
+                {
+                    switchNS();
+                }
             }
         }
-        else if ((northLane.isStalled() || southLane.isStalled()) && hasPassedIntersection(eastLane.carPos()) && hasPassedIntersection(westLane.carPos()))
+        else if (allRedTime > 0)
         {
-            if (cooldownTicks == 0)
-            {
-                cooldownTicks = COOLDOWN_TIME_TICKS;
-                northLane.toggleGreen();
-                southLane.toggleGreen();
-                eastLane.toggleRed();
-                westLane.toggleRed();
-            }
+            allRedTime--;
         }
-        
-        if (cooldownTicks > 0)
+    }
+    
+    private void update()
+    {
+        if (cooldownTicks == 0)
+            {
+            switchLanes();
+        }
+        else if (cooldownTicks > 0)
         {
             cooldownTicks--;
         }
     }
     
     public void draw()
-    {
+        {
         update();
         
         drawBackground();
@@ -82,12 +125,12 @@ class Intersection
     }
     
     private void drawBackground()
-    {
+        {
         background(DARK_GREEN);
     }
     
     private void drawRoads()
-    {
+        {
         rectMode(CENTER);
         fill(DARK_GREY);
         noStroke();
@@ -97,7 +140,7 @@ class Intersection
     }
     
     private void drawLanes()
-    {
+        {
         eastLane.draw();
         westLane.draw();
         northLane.draw();
