@@ -13,7 +13,7 @@ class Cannon
     
     private boolean isRotating;
     private int rotationSign;
-    private int rotationsOffset;
+    private int rotationsIndex;
     
     public Cannon(int x, int y, int size, color drawColor)
     {
@@ -24,7 +24,7 @@ class Cannon
         
         this.angle = 0;
         this.isRotating = false;
-        this.rotationsOffset = 0;
+        this.rotationsIndex = 0;
     }
     
     public void rotateLeft()
@@ -33,7 +33,7 @@ class Cannon
         {
             isRotating = true;
             rotationSign = -1;
-            rotationsOffset += -1;
+            rotationsIndex += -1;
         }
     }
     
@@ -43,7 +43,7 @@ class Cannon
         {
             isRotating = true;
             rotationSign = 1;
-            rotationsOffset += 1;
+            rotationsIndex += 1;
         }
     }
     
@@ -52,10 +52,10 @@ class Cannon
         float ammountToRotate = rotationSign * ROTATION_SPEED * deltaT;
         angle += ammountToRotate;
         
-        if ((rotationSign == 1 && angle >= rotationsOffset * ROTATION_ANGLE) || 
-           (rotationSign == -1 && angle <= rotationsOffset * ROTATION_ANGLE))
+        if ((rotationSign == 1 && angle >= rotationsIndex * ROTATION_ANGLE) || 
+           (rotationSign == -1 && angle <= rotationsIndex * ROTATION_ANGLE))
         {
-            angle = rotationsOffset * ROTATION_ANGLE; // snaps into correct angle
+            angle = rotationsIndex * ROTATION_ANGLE; // snaps into correct angle
             isRotating = false;
         }
     }
