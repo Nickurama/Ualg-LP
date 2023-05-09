@@ -1,29 +1,29 @@
 class Bubble
 {
-
+    
     //Bubble colors
-    final private color ORANGE = color(248, 184, 139);
-    final private color GREEN = color(186, 237, 145);
-    final private color RED = color(254, 163, 170);
-    final private color BLUE = color(178, 206, 254);
+    final private color ORANGE = color(255, 233, 186);
+    final private color GREEN = color(186, 255, 201);
+    final private color RED = color(255, 179, 186);
+    final private color BLUE = color(186, 225, 255);
     final private color PINK = color(255, 192, 203);
-    final private color PURPLE = color(128, 0, 128);
-
+    final private color YELLOW = color(255, 255, 186);
+    
     final private int COLOR_AMMOUNT = 6;
-    final private color[] COLORS = { ORANGE, GREEN, RED, BLUE, PINK, PURPLE };
-
+    final private color[] COLORS = { ORANGE, GREEN, RED, BLUE, PINK, YELLOW };
+    
     //fields
     final private int DEFAULT_SPEED = 15;
-
-    private int x;
-    private int y;
+    
+    private float x;
+    private float y;
     private int size;
     private float angle;
     private float speed;
     private color drawColor;
     private boolean isMoving;
-
-    public Bubble(int x, int y, int size, color drawColor)
+    
+    public Bubble(float x, float y, int size, color drawColor)
     {
         this.x = x;
         this.y = y;
@@ -33,7 +33,7 @@ class Bubble
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
     }
-
+    
     public Bubble(int x, int y, int size)
     {
         this.x = x;
@@ -44,12 +44,12 @@ class Bubble
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
     }
-
+    
     private color randomColor()
     {
         return COLORS[int(random(COLOR_AMMOUNT))];
     }
-
+    
     private void move()
     {
         if (isMoving)
@@ -58,18 +58,23 @@ class Bubble
             y += speed * sin(angle);
         }
     }
-
+    
+    public void ricochet()
+    {
+        angle = PI - angle;
+    }
+    
     public void launch(float angle)
     {
         this.angle = angle;
         isMoving = true;
     }
-
+    
     public void update()
     {
         move();
     }
-
+    
     public void draw()
     {
         fill(drawColor);
@@ -77,8 +82,10 @@ class Bubble
         strokeWeight(size / 10);
         circle(x, y, size);
     }
-
-    public void setPos(int x, int y) { setX(x); setY(y); }
-    public void setX(int x) { this.x = x; }
-    public void setY(int y) { this.y = y; }
+    
+    public void setPos(float x, float y) { setX(x); setY(y); }
+    public void setX(float x) { this.x = x; }
+    public float getX() { return this.x; }
+    public void setY(float y) { this.y = y; }
+    public float getY() { return this.y; }
 }

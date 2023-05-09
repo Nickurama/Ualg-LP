@@ -6,19 +6,21 @@ class Ceiling
     private color descendingColor;
     private int bubbleSize;
     private int widthBubbles;
+    private int heightBubbles;
     private int padding;
     private int maxLevel;
     
     private int level;
     private float timeElapsed;
     
-    public Ceiling(color topColor, color descendingColor, int bubbleSize, int widthBubbles, int padding, int maxLevel)
+    public Ceiling(color topColor, color descendingColor, int bubbleSize, int widthBubbles, int heightBubbles, int padding, int maxLevel)
     {
         this.topColor = topColor;
         this.descendingColor = descendingColor;
         this.bubbleSize = bubbleSize;
         
         this.widthBubbles = widthBubbles;
+        this.heightBubbles = heightBubbles;
         this.padding = padding;
         this.maxLevel = maxLevel;
         
@@ -44,7 +46,9 @@ class Ceiling
         rectMode(CORNER);
         noStroke();
         fill(topColor);
-        rect(padding, 0, bubbleSize * widthBubbles, padding);
+        rect(0, 0, bubbleSize * widthBubbles + 2 * padding, padding); //top section
+        rect(0, 0, padding, bubbleSize * heightBubbles + padding); //left side
+        rect(bubbleSize * widthBubbles + padding, 0, padding, bubbleSize * heightBubbles + padding); //right side
         fill(descendingColor);
         rect(padding, padding, bubbleSize * widthBubbles, bubbleSize * level);
     }

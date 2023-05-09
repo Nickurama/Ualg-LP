@@ -5,8 +5,8 @@ class Cannon
     final private float ROTATION_SPEED = PI / 4; // 45º/s
     final private int HEIGHT_WIDTH_RATIO = 3; // 3:1 height:width
     
-    private int x;
-    private int y;
+    private float x;
+    private float y;
     private int size;
     private color drawColor;
     private float angle;
@@ -14,10 +14,11 @@ class Cannon
     private boolean isRotating;
     private int rotationSign;
     private int rotationsIndex;
-
-    private Bubble loadedBubble;
     
-    public Cannon(int x, int y, int size, color drawColor)
+    private Bubble loadedBubble;
+    private boolean hasBubbleLoaded;
+    
+    public Cannon(float x, float y, int size, color drawColor)
     {
         this.x = x;
         this.y = y;
@@ -27,6 +28,7 @@ class Cannon
         this.angle = 0;
         this.isRotating = false;
         this.rotationsIndex = 0;
+        this.hasBubbleLoaded = false;
     }
     
     public void rotateLeft()
@@ -61,21 +63,26 @@ class Cannon
             isRotating = false;
         }
     }
-
+    
     public void loadBubble(Bubble bubble)
     {
         loadedBubble = bubble;
         loadedBubble.setPos(this.x, this.y);
+        hasBubbleLoaded = true;
     }
-
-    public void shoot()
+    
+    public void shoot() // returns true if shooting was sucessful
     {
-        loadedBubble.launch(angle - PI / 2); //cannon's 0º is up
+        if (hasBubbleLoaded)
+        {
+            println("pew pew! :3");
+            loadedBubble.launch(angle - PI / 2); //cannon's 0º is up
+            hasBubbleLoaded = false;
+        }
     }
     
     public void update(float deltaT)
     {
-        loadedBubble.update();
         if (isRotating)
         {
             applyRotation(deltaT);
@@ -84,7 +91,6 @@ class Cannon
     
     public void draw()
     {
-        loadedBubble.draw();
         pushMatrix();
         translate(x,y);
         rectMode(CENTER);
@@ -95,4 +101,7 @@ class Cannon
         rect(0, 0, size, HEIGHT_WIDTH_RATIO * size, 0, 0, size / 2, size / 2);
         popMatrix();
     }
+    
+    public float getX() { return this.x; }
+    public float getY() { return this.y; }
 }
