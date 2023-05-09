@@ -1,6 +1,5 @@
 class Bubble
 {
-    
     //Bubble colors
     final private color ORANGE = color(255, 233, 186);
     final private color GREEN = color(186, 255, 201);
@@ -23,6 +22,8 @@ class Bubble
     private color drawColor;
     private boolean isMoving;
     
+    private BubbleCell cell;
+    
     public Bubble(float x, float y, int size, color drawColor)
     {
         this.x = x;
@@ -32,6 +33,7 @@ class Bubble
         this.drawColor = drawColor;
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
+        this.cell = null;
     }
     
     public Bubble(int x, int y, int size)
@@ -43,6 +45,7 @@ class Bubble
         this.drawColor = randomColor();
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
+        this.cell = null;
     }
     
     private color randomColor()
@@ -70,6 +73,26 @@ class Bubble
         isMoving = true;
     }
     
+    public void stop()
+    {
+        isMoving = false;
+    }
+    
+    public float dist(float x, float y)
+    {
+        return sqrt(pow((x - this.x), 2) + pow((y - this.y), 2));
+    }
+    
+    public float dist(Bubble b)
+    {
+        return dist(b.getX(), b.getY());
+    }
+    
+    public float dist(BubbleCell c)
+    {
+        return dist(c.getX(), c.getY());
+    }
+    
     public void update()
     {
         move();
@@ -83,6 +106,8 @@ class Bubble
         circle(x, y, size);
     }
     
+    public void setCell(BubbleCell c) { this.cell = c; }
+    public BubbleCell getCell() { return this.cell; }
     public void setPos(float x, float y) { setX(x); setY(y); }
     public void setX(float x) { this.x = x; }
     public float getX() { return this.x; }

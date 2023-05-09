@@ -1,6 +1,6 @@
 class Ceiling
 {
-    final private float COOLDOWN = 20;
+    final private float COOLDOWN = 500;
     
     private color topColor;
     private color descendingColor;
@@ -50,6 +50,6 @@ class Ceiling
         rect(0, 0, padding, bubbleSize * heightBubbles + padding); //left side
         rect(bubbleSize * widthBubbles + padding, 0, padding, bubbleSize * heightBubbles + padding); //right side
         fill(descendingColor);
-        rect(padding, padding, bubbleSize * widthBubbles, bubbleSize * level);
+        rect(padding, padding, bubbleSize * widthBubbles, bubbleSize * level * cos(PI / 6));
     }
 }

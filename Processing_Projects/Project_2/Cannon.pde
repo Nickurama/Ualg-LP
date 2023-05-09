@@ -71,14 +71,17 @@ class Cannon
         hasBubbleLoaded = true;
     }
     
-    public void shoot() // returns true if shooting was sucessful
+    public boolean shoot() // returns true if shooting was sucessful
     {
-        if (hasBubbleLoaded)
+        boolean hasShot = false;
+        if (hasBubbleLoaded && !isRotating)
         {
             println("pew pew! :3");
             loadedBubble.launch(angle - PI / 2); //cannon's 0º is up
             hasBubbleLoaded = false;
+            hasShot = true;
         }
+        return hasShot;
     }
     
     public void update(float deltaT)
