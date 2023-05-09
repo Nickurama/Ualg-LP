@@ -14,6 +14,8 @@ class Cannon
     private boolean isRotating;
     private int rotationSign;
     private int rotationsIndex;
+
+    private Bubble loadedBubble;
     
     public Cannon(int x, int y, int size, color drawColor)
     {
@@ -59,9 +61,21 @@ class Cannon
             isRotating = false;
         }
     }
+
+    public void loadBubble(Bubble bubble)
+    {
+        loadedBubble = bubble;
+        loadedBubble.setPos(this.x, this.y);
+    }
+
+    public void shoot()
+    {
+        loadedBubble.launch(angle - PI / 2); //cannon's 0º is up
+    }
     
     public void update(float deltaT)
     {
+        loadedBubble.update();
         if (isRotating)
         {
             applyRotation(deltaT);
@@ -69,7 +83,8 @@ class Cannon
     }
     
     public void draw()
-        {
+    {
+        loadedBubble.draw();
         pushMatrix();
         translate(x,y);
         rectMode(CENTER);
