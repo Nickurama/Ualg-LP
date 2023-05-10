@@ -129,7 +129,7 @@ class BubbleGrid
                 }
                 if (column < 9 && !bubbleGrid[row + 1][columnIndex + 1].hasBubble) // right
                 {
-                    println("found down right: " + (row + 1) + "," + column + 1);
+                    println("found down right: " + (row + 1) + "," + (column + 1));
                     adjacentCells.add(bubbleGrid[row + 1][columnIndex + 1]);
                 }
             }
