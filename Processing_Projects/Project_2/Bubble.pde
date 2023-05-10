@@ -1,12 +1,12 @@
 class Bubble
 {
     //Bubble colors
-    final private color ORANGE = color(255, 233, 186);
-    final private color GREEN = color(186, 255, 201);
-    final private color RED = color(255, 179, 186);
-    final private color BLUE = color(186, 225, 255);
-    final private color PINK = color(255, 192, 203);
-    final private color YELLOW = color(255, 255, 186);
+    final private color ORANGE = color(255, 128, 0);
+    final private color GREEN = color(51, 255, 51);
+    final private color RED = color(255, 51, 51);
+    final private color BLUE = color(0, 0, 255);
+    final private color PINK = color(255, 204, 204);
+    final private color YELLOW = color(255, 255, 51);
     
     final private int COLOR_AMMOUNT = 6;
     final private color[] COLORS = { ORANGE, GREEN, RED, BLUE, PINK, YELLOW };
@@ -106,6 +106,7 @@ class Bubble
         circle(x, y, size);
     }
     
+    public color getColor() { return this.drawColor; }
     public void setCell(BubbleCell c) { this.cell = c; }
     public BubbleCell getCell() { return this.cell; }
     public void setPos(float x, float y) { setX(x); setY(y); }

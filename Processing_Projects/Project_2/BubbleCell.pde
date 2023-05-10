@@ -38,10 +38,7 @@ class BubbleCell
         }
     }
     
-    public boolean hasBubble()
-    {
-        return hasBubble;
-    }
+    
     
     public void debugDraw()
     {
@@ -51,6 +48,8 @@ class BubbleCell
         circle(x, y, DEBUG_CIRCLE_SIZE);
     }
     
+    public boolean hasBubble() { return hasBubble; }
+    public Bubble getBubble() { if (hasBubble) { return this.bubble; } else { return null; } }
     public float getX() { return this.x; }
     public float getY() { return this.y; }
     public int getRow() { return this.row; }

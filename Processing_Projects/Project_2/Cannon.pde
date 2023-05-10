@@ -71,6 +71,12 @@ class Cannon
         hasBubbleLoaded = true;
     }
     
+    public Bubble unloadBubble()
+    {
+        hasBubbleLoaded = false;
+        return loadedBubble;
+    }
+    
     public boolean shoot() // returns true if shooting was sucessful
     {
         boolean hasShot = false;

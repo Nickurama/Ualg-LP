@@ -93,87 +93,47 @@ class BubbleGrid
         
         if (row % 2 == 0) // even
         {
-            if (column - 1 >= 0 && !bubbleGrid[row][column - 1].hasBubble) // left
-            {
-                println("found left: " + row + "," + (column - 1));
+            if (column - 1 >= 0) // left
                 adjacentCells.add(bubbleGrid[row][column - 1]);
-            }
-            if (column + 1 < columns && !bubbleGrid[row][column + 1].hasBubble) //right
-            {
-                println("found right: " + row + "," + (column + 1));
+            if (column + 1 < columns) //right
                 adjacentCells.add(bubbleGrid[row][column + 1]);
-            }
             
             if (row - 1 > 0) // up
             {
-                int columnIndex = column - 1; // odds are shifted 1 to the left in the array
-                if (column > 0 && !bubbleGrid[row - 1][columnIndex].hasBubble) // left (same column)
-                {
-                    println("found up left: " + (row - 1) + "," + column);
+                int columnIndex = column - 1; // odds are shifted 1 to the left in the array in relation to column index
+                if (column > 0) // left (same column)
                     adjacentCells.add(bubbleGrid[row - 1][columnIndex]);
-                }
-                if (column < 9 && !bubbleGrid[row - 1][columnIndex + 1].hasBubble) // right
-                {
-                    println("found up right: " + (row - 1) + "," + (column + 1));
+                if (column < 9) // right
                     adjacentCells.add(bubbleGrid[row - 1][columnIndex + 1]);
-                }
             }
             
             if (row + 1 < rows) // down
             {
                 int columnIndex = column - 1; // odds are shifted 1 to the left in the array
-                if (column > 0 && !bubbleGrid[row + 1][columnIndex].hasBubble) // left (same column)
-                {
-                    println("found down left: " + (row + 1) + "," + column);
+                if (column > 0) // left (same column)
                     adjacentCells.add(bubbleGrid[row + 1][columnIndex]);
-                }
-                if (column < 9 && !bubbleGrid[row + 1][columnIndex + 1].hasBubble) // right
-                {
-                    println("found down right: " + (row + 1) + "," + (column + 1));
+                if (column < 9) // right
                     adjacentCells.add(bubbleGrid[row + 1][columnIndex + 1]);
-                }
             }
         }
         else // odd
         {
             int columnIndex = column - 1; // odds are shifted 1 to the left in the array
-            if (column - 1 > 0 && !bubbleGrid[row][columnIndex - 1].hasBubble) // left
-            {
-                println("found left: " + row + "," + (column - 1));
+            if (column - 1 > 0) // left
                 adjacentCells.add(bubbleGrid[row][columnIndex - 1]);
-            }
-            if (column + 1 < columns && !bubbleGrid[row][columnIndex + 1].hasBubble) //right
-            {
-                println("found right: " + row + "," + (column + 1));
+            if (column + 1 < columns) //right
                 adjacentCells.add(bubbleGrid[row][columnIndex + 1]);
-            }
             
             if (row - 1 >= 0) // up
             {
-                if (!bubbleGrid[row - 1][column - 1].hasBubble) // left
-                {
-                    println("found up left: " + (row - 1) + "," + (column - 1));
-                    adjacentCells.add(bubbleGrid[row - 1][column - 1]);
-                }
-                if (!bubbleGrid[row - 1][column].hasBubble) // right (same column)
-                {
-                    println("found up right: " + (row - 1) + "," + column);
-                    adjacentCells.add(bubbleGrid[row - 1][column]);
-                }
+                adjacentCells.add(bubbleGrid[row - 1][column - 1]); // left
+                adjacentCells.add(bubbleGrid[row - 1][column]); // right
             }
             
             if (row + 1 <= rows) // down
             {
-                if (!bubbleGrid[row + 1][column - 1].hasBubble) // left
-                {
-                    println("found down left: " + (row + 1) + "," + (column - 1));
-                    adjacentCells.add(bubbleGrid[row + 1][column - 1]);
-                }
-                if (!bubbleGrid[row + 1][column].hasBubble) // right (same column)
-                {
-                    println("found down right: " + (row + 1) + "," + column);
-                    adjacentCells.add(bubbleGrid[row + 1][column]);
-                }
+                adjacentCells.add(bubbleGrid[row + 1][column - 1]); // left
+                adjacentCells.add(bubbleGrid[row + 1][column]); // right
             }
         }
         
@@ -183,13 +143,17 @@ class BubbleGrid
     public void snap(Bubble snapBubble, Bubble anchor)
     {
         ArrayList<BubbleCell> adjacentCells = getAdjacentCells(anchor.getCell());
+        ArrayList<BubbleCell> freeCells = new ArrayList<BubbleCell>();
+        for (BubbleCell cell : adjacentCells)
+            if (!cell.hasBubble())
+                freeCells.add(cell);
         
-        if (adjacentCells.size() > 0)
+        if (freeCells.size() > 0)
         {
-            float closestDist = snapBubble.dist(adjacentCells.get(0));
-            BubbleCell closestCell = adjacentCells.get(0);
+            float closestDist = snapBubble.dist(freeCells.get(0));
+            BubbleCell closestCell = freeCells.get(0);
             
-            for (BubbleCell cell : adjacentCells)
+            for (BubbleCell cell : freeCells)
             {
                 float newDist = snapBubble.dist(cell);
                 if (newDist < closestDist)
@@ -206,6 +170,53 @@ class BubbleGrid
         {
             println("Error: no available adjacent cell!");
         }
+    }
+    
+    private float dist(float x1, float y1, float x2, float y2)
+    {
+        return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2));
+    }
+    
+    public void snap(Bubble snapBubble)
+    {
+        float closestDist = snapBubble.dist(bubbleGrid[0][0]);
+        BubbleCell closestCell = bubbleGrid[0][0];
+        for (BubbleCell[] row : bubbleGrid)
+        {
+            for (BubbleCell c : row)
+            {
+                float dist = snapBubble.dist(c);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestCell = c;
+                }
+            }
+        }
+        
+        closestCell.setBubble(snapBubble);
+        snapBubble.setCell(closestCell);
+    }
+    
+    private ArrayList<BubbleCell> getColorCluster(BubbleCell initial)
+    {
+        ArrayList<BubbleCell> closed = new ArrayList<BubbleCell>();
+        ArrayList<BubbleCell> open = new ArrayList<BubbleCell>();
+        open.add(initial);
+        
+        while(open.size() > 0)
+        {
+            BubbleCell cell = open.get(0);
+            open.remove(0);
+            closed.add(cell);
+            
+            ArrayList<BubbleCell> adjacentCells = getAdjacentCells(cell);
+            for (BubbleCell c : adjacentCells)
+                if (c.hasBubble() && c.getBubble().getColor() == cell.getBubble().getColor() && !closed.contains(c) && !open.contains(c))
+                    open.add(c);
+        }
+        
+        return closed;
     }
     
     private void drawDebug()
