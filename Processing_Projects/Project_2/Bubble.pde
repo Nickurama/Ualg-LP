@@ -21,6 +21,7 @@ class Bubble
     private float speed;
     private color drawColor;
     private boolean isMoving;
+    private boolean hasCollision;
     
     private BubbleCell cell;
     
@@ -34,6 +35,7 @@ class Bubble
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
         this.cell = null;
+        this.hasCollision = true;
     }
     
     public Bubble(int x, int y, int size)
@@ -46,6 +48,7 @@ class Bubble
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
         this.cell = null;
+        this.hasCollision = true;
     }
     
     private color randomColor()
@@ -62,14 +65,14 @@ class Bubble
         }
     }
     
-    public void ricochet()
-    {
-        angle = PI - angle;
-    }
-    
     public void launch(float angle)
     {
         this.angle = angle;
+        isMoving = true;
+    }
+    
+    public void launch()
+    {
         isMoving = true;
     }
     
@@ -93,6 +96,52 @@ class Bubble
         return dist(c.getX(), c.getY());
     }
     
+    private void ricochet()
+    {
+        angle = PI - angle;
+    }
+    
+    public boolean collides(Bubble b, float collisionOffset)
+    {
+        return dist(b) < (float)size * collisionOffset;
+    }
+    
+    public boolean collidesCeiling(int padding)
+    {
+        boolean result = false;
+        if (this.y - (float)this.size / 2 < padding)
+        {
+            result = true;
+            stop();
+            this.y = padding + this.size / 2;
+        }
+        return result;
+    }
+    
+    public boolean isBelowScreen(int windowHeight)
+    {
+        boolean result = false;
+        if (this.y - this.size / 2 > windowHeight)
+            result = true;
+        return result;
+    }
+    
+    public void handleWallCollision(int padding, int windowWidth)
+    {
+        if (this.x - this.size / 2 < padding)
+        {
+            this.x = padding + size / 2;
+            ricochet();
+        }
+        else if (x + size / 2 > windowWidth - padding)
+        {
+            x = windowWidth - padding - this.size / 2;
+            ricochet();
+        }
+    }
+    
+    
+    
     public void update()
     {
         move();
@@ -106,6 +155,12 @@ class Bubble
         circle(x, y, size);
     }
     
+    public void setCollision(boolean collision) { this.hasCollision = collision; }
+    public boolean hasCollision() { return this.hasCollision; }
+    public void setSpeed(float speed) { this.speed = speed; }
+    public float getSpeed() { return this.speed; }
+    public void setAngle(float angle) { this.angle = angle; }
+    public float getAngle() { return this.angle; }
     public color getColor() { return this.drawColor; }
     public void setCell(BubbleCell c) { this.cell = c; }
     public BubbleCell getCell() { return this.cell; }

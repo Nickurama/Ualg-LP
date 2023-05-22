@@ -8,6 +8,7 @@ class BubbleCell
     private int column;
     private Bubble bubble;
     private boolean hasBubble;
+    private boolean isConnected;
     
     public BubbleCell(float x, float y, int row, int column)
     {
@@ -38,8 +39,6 @@ class BubbleCell
         }
     }
     
-    
-    
     public void debugDraw()
     {
         noFill();
@@ -54,4 +53,7 @@ class BubbleCell
     public float getY() { return this.y; }
     public int getRow() { return this.row; }
     public int getColumn() { return this.column; }
+    public boolean isConnected() { return this.isConnected; }
+    public void setConnected() { this.isConnected = true; }
+    public void setDisconnected() { this.isConnected = false; }
 }

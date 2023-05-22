@@ -1,6 +1,5 @@
 class BubbleGrid
 {
-    
     private float x;
     private float y;
     private int rows;
@@ -217,6 +216,60 @@ class BubbleGrid
         }
         
         return closed;
+    }
+    
+    private void markConnectedCells()
+    {
+        ArrayList<BubbleCell> open = new ArrayList<BubbleCell>();
+        for (BubbleCell c : this.bubbleGrid[0])
+        {
+            if (c.hasBubble())
+            {
+                println("bubble detected!");
+                open.add(c);
+            }
+        }
+        
+        while(open.size() > 0)
+        {
+            BubbleCell c = open.get(0);
+            open.remove(0);
+            c.setConnected();
+            ArrayList<BubbleCell> adjacentCells = getAdjacentCells(c);
+            for (BubbleCell adjacentCell : adjacentCells)
+            {
+                if (adjacentCell.hasBubble() && !adjacentCell.isConnected() && !open.contains(adjacentCell))
+                {
+                    println("bubble detected combo!");
+                    open.add(adjacentCell);
+                }
+            }
+        }
+    }
+    
+    public void freeUnconnectedBubbles()
+    {
+        for (BubbleCell[] row : bubbleGrid)
+        {
+            for (BubbleCell cell : row)
+            {
+                cell.setDisconnected();
+            }
+        }
+        
+        markConnectedCells();
+        
+        for (BubbleCell[] row : bubbleGrid)
+        {
+            for (BubbleCell cell : row)
+            {
+                if (cell.hasBubble && !cell.isConnected())
+                {
+                    cell.getBubble().launch(PI / 2);
+                    cell.getBubble().setCollision(false);
+                }
+            }
+        }
     }
     
     private void drawDebug()

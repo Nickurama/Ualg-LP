@@ -31,13 +31,13 @@ float cannonToNextBubbleDistY;
 float timeElapsed;
 float timeElapsedAnimation;
 boolean isReloadingCannon;
-ArrayList<Bubble> bubblesToPop;
 
 //Playspace elements
 Cannon cannon;
 Ceiling ceiling;
 Bubble nextBubble;
 ArrayList<Bubble> bubbles;
+ArrayList<Bubble> removeBubblesQueue;
 BubbleGrid bubbleGrid;
 
 void settings()
@@ -51,7 +51,7 @@ void setup()
 {
     bubbleGrid = new BubbleGrid(PADDING, PADDING, HEIGHT_BUBBLES - CANNON_SPACE_BUBBLES, WIDTH_BUBBLES, BUBBLE_SIZE, PADDING);
     bubbles = new ArrayList<Bubble>();
-    bubblesToPop = new ArrayList<Bubble>();
+    removeBubblesQueue = new ArrayList<Bubble>();
     timeElapsed = 0;
     timeElapsedAnimation = 0;
     nextBubbleDisplayX = windowWidth / 2 - (2 * BUBBLE_SIZE);
@@ -147,44 +147,45 @@ void handleClusterFromCell(BubbleCell cell)
         println("Cluster detected!");
         for (BubbleCell c : colorCluster)
         {
-            Bubble pop = c.getBubble();
+            removeBubblesQueue.add(c.getBubble());
             c.removeBubble();
-            bubblesToPop.add(pop);
         }
+        bubbleGrid.freeUnconnectedBubbles();
     }
 }
 
 void handleCollisions(Bubble b)
 {
-    if (b.getX() - BUBBLE_SIZE / 2 < PADDING) // left wall collision
+    b.handleWallCollision(PADDING, windowWidth); // wall collision
+    
+    if (b.collidesCeiling(PADDING)) // ceiling collision
     {
-        b.setX(PADDING + BUBBLE_SIZE / 2);
-        b.ricochet();
-    }
-    else if (b.getX() + BUBBLE_SIZE / 2 > windowWidth - PADDING) // right wall collision
-    {
-        b.setX(windowWidth - PADDING - BUBBLE_SIZE / 2);
-        b.ricochet();
+        bubbleGrid.snapCeiling(b); // !! REFACTOR TO DO INSIDE BUBBLE
     }
     
-    if (b.getY() - (float)BUBBLE_SIZE / 2 < PADDING) // ceiling collision
+    if (b.isBelowScreen(windowHeight))
     {
-        println("ceiling collision detected!");
-        b.stop();
-        b.setY(PADDING + BUBBLE_SIZE / 2);
-        bubbleGrid.snapCeiling(b);
+        println("Bubble out of screen cleaned up!");
+        removeBubblesQueue.add(b);
     }
     
     for (Bubble bubble : bubbles) //bubble collision
     {
-        if (b.dist(bubble) < (float)BUBBLE_SIZE * COLLISION_OFFSET_MULTIPLIER && b != bubble)
+        if (b.hasCollision() && bubble.hasCollision() && b != bubble && b.collides(bubble, COLLISION_OFFSET_MULTIPLIER))
         {
             println("collision detected!");
             b.stop();
             bubbleGrid.snap(b, bubble);
             handleClusterFromCell(b.getCell());
-            
         }
+    }
+}
+
+void clearRemoveBubblesQueue()
+{
+    for (Bubble b : removeBubblesQueue)
+    {
+        bubbles.remove(b);
     }
 }
 
@@ -194,14 +195,6 @@ void updateBubbles()
     {
         b.update();
         handleCollisions(b);
-    }
-}
-
-void popBubbles()
-{
-    for (Bubble b : bubblesToPop)
-    {
-        bubbles.remove(b);
     }
 }
 
@@ -216,7 +209,7 @@ void update()
     
     
     updateBubbles();
-    popBubbles();
+    clearRemoveBubblesQueue();
     
     cannon.update(deltaT);
     ceiling.update(deltaT);
