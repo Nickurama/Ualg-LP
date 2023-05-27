@@ -35,7 +35,7 @@ class Bubble
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
         this.cell = null;
-        this.hasCollision = true;
+        this.hasCollision = false;
     }
     
     public Bubble(int x, int y, int size)
@@ -48,7 +48,7 @@ class Bubble
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
         this.cell = null;
-        this.hasCollision = true;
+        this.hasCollision = false;
     }
     
     private color randomColor()
@@ -106,14 +106,13 @@ class Bubble
         return dist(b) < (float)size * collisionOffset;
     }
     
-    public boolean collidesCeiling(int padding)
+    public boolean collidesCeiling(float ceilingHeight)
     {
         boolean result = false;
-        if (this.y - (float)this.size / 2 < padding)
+        if (this.y - (float)this.size / 2 < ceilingHeight)
         {
             result = true;
-            stop();
-            this.y = padding + this.size / 2;
+            this.y = ceilingHeight + this.size / 2;
         }
         return result;
     }
@@ -155,6 +154,7 @@ class Bubble
         circle(x, y, size);
     }
     
+    public boolean isMoving() { return this.isMoving; }
     public void setCollision(boolean collision) { this.hasCollision = collision; }
     public boolean hasCollision() { return this.hasCollision; }
     public void setSpeed(float speed) { this.speed = speed; }

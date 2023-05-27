@@ -150,33 +150,39 @@ void handleClusterFromCell(BubbleCell cell)
             removeBubblesQueue.add(c.getBubble());
             c.removeBubble();
         }
-        bubbleGrid.freeUnconnectedBubbles();
+        bubbleGrid.freeUnconnectedBubbles(ceiling.getLevel());
     }
 }
 
 void handleCollisions(Bubble b)
 {
-    b.handleWallCollision(PADDING, windowWidth); // wall collision
-    
-    if (b.collidesCeiling(PADDING)) // ceiling collision
-    {
-        bubbleGrid.snapCeiling(b); // !! REFACTOR TO DO INSIDE BUBBLE
-    }
-    
     if (b.isBelowScreen(windowHeight))
     {
         println("Bubble out of screen cleaned up!");
         removeBubblesQueue.add(b);
     }
     
-    for (Bubble bubble : bubbles) //bubble collision
+    if (b.hasCollision())
     {
-        if (b.hasCollision() && bubble.hasCollision() && b != bubble && b.collides(bubble, COLLISION_OFFSET_MULTIPLIER))
+        b.handleWallCollision(PADDING, windowWidth); // wall collision
+        
+        if (b.collidesCeiling(ceiling.getHeight())) // ceiling collision
         {
-            println("collision detected!");
+            println("ceiling collision detected!");
             b.stop();
-            bubbleGrid.snap(b, bubble);
-            handleClusterFromCell(b.getCell());
+            b.setCollision(false);
+            bubbleGrid.snapCeiling(b);
+        }
+        
+        for (Bubble bubble : bubbles) //bubble collision
+        {
+            if (b != bubble && b.collides(bubble, COLLISION_OFFSET_MULTIPLIER))
+            {
+                println("collision detected!");
+                b.stop();
+                bubbleGrid.snap(b, bubble);
+                handleClusterFromCell(b.getCell());
+            }
         }
     }
 }
@@ -207,12 +213,12 @@ void update()
     if (isReloadingCannon)
         reloadCannonAnimation(deltaT);
     
-    
     updateBubbles();
     clearRemoveBubblesQueue();
     
     cannon.update(deltaT);
     ceiling.update(deltaT);
+    bubbleGrid.update(ceiling.getLevel(), ceiling.getHeight());
 }
 
 void draw()

@@ -1,6 +1,6 @@
 class Ceiling
 {
-    final private float COOLDOWN = 500;
+    final private float COOLDOWN = 2;
     
     private color topColor;
     private color descendingColor;
@@ -52,4 +52,7 @@ class Ceiling
         fill(descendingColor);
         rect(padding, padding, bubbleSize * widthBubbles, bubbleSize * level * cos(PI / 6));
     }
+    
+    public float getHeight() { return this.padding + this.level * this.bubbleSize * cos(PI / 6); }
+    public int getLevel() { return this.level; }
 }

@@ -9,6 +9,7 @@ class BubbleGrid
     private int halfBubbleSize;
     private float cosThirty;
     private BubbleCell bubbleGrid[][];
+    private int currentCeilingLevel;
     
     public BubbleGrid(float x, float y, int rows, int columns, int bubbleSize, int padding)
     {
@@ -20,7 +21,8 @@ class BubbleGrid
         this.padding = padding;
         this.halfBubbleSize = bubbleSize / 2;
         this.cosThirty = cos(PI / 6);
-        bubbleGrid = new BubbleCell[rows][columns];
+        this.bubbleGrid = new BubbleCell[rows][columns];
+        this.currentCeilingLevel = 0;
         
         for (int i = 0; i < rows; i++)
         {
@@ -55,33 +57,21 @@ class BubbleGrid
     
     public void snapCeiling(Bubble b)
     {
-        if (rows > 0 && columns > 0)
+        float closestDist = b.dist(bubbleGrid[0][0].getX(), bubbleGrid[0][0].getY());
+        BubbleCell closestCell = bubbleGrid[0][0]; //default
+        
+        for (BubbleCell cell : bubbleGrid[0]) //closest cell
         {
-            float closestDist = b.dist(bubbleGrid[0][0].getX(), bubbleGrid[0][0].getY());
-            BubbleCell closestCell = bubbleGrid[0][0]; //default
-            
-            for (BubbleCell cell : bubbleGrid[0]) //initial cell
+            float newDist = b.dist(cell);
+            if (newDist < closestDist && !cell.hasBubble())
             {
-                if (!cell.hasBubble())
-                {
-                    closestCell = cell;
-                    break;
-                }
+                closestDist = newDist;
+                closestCell = cell;
             }
-            
-            for (BubbleCell cell : bubbleGrid[0]) //closest cell
-            {
-                float newDist = b.dist(cell);
-                if (newDist < closestDist && !cell.hasBubble())
-                {
-                    closestDist = newDist;
-                    closestCell = cell;
-                }
-            }
-            
-            closestCell.setBubble(b);
-            b.setCell(closestCell);
         }
+        
+        closestCell.setBubble(b);
+        b.setCell(closestCell);
     }
     
     private ArrayList<BubbleCell> getAdjacentCells(BubbleCell c)
@@ -218,10 +208,10 @@ class BubbleGrid
         return closed;
     }
     
-    private void markConnectedCells()
+    private void markConnectedCells(int ceilingLevel)
     {
         ArrayList<BubbleCell> open = new ArrayList<BubbleCell>();
-        for (BubbleCell c : this.bubbleGrid[0])
+        for (BubbleCell c : this.bubbleGrid[ceilingLevel])
         {
             if (c.hasBubble())
             {
@@ -247,7 +237,7 @@ class BubbleGrid
         }
     }
     
-    public void freeUnconnectedBubbles()
+    public void freeUnconnectedBubbles(int ceilingLevel)
     {
         for (BubbleCell[] row : bubbleGrid)
         {
@@ -257,7 +247,7 @@ class BubbleGrid
             }
         }
         
-        markConnectedCells();
+        markConnectedCells(ceilingLevel);
         
         for (BubbleCell[] row : bubbleGrid)
         {
@@ -269,6 +259,28 @@ class BubbleGrid
                     cell.getBubble().setCollision(false);
                 }
             }
+        }
+    }
+    
+    private void updateCells(float yOffset)
+    {
+        for (BubbleCell[] row : bubbleGrid)
+        {
+            for (BubbleCell cell : row)
+            {
+                cell.setY(cell.getY() + yOffset);
+            }
+        }
+    }
+    
+    public void update(int ceilingLevel, float ceilingHeight)
+    {
+        if (ceilingLevel != currentCeilingLevel)
+        {
+            this.currentCeilingLevel = ceilingLevel;
+            float yOffset = ceilingHeight - this.y;
+            updateCells(yOffset);
+            this.y = ceilingHeight;
         }
     }
     
