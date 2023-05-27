@@ -1,6 +1,6 @@
 class Ceiling
 {
-    final private float COOLDOWN = 10;
+    final private float COOLDOWN = 100;
     
     private color topColor;
     private color descendingColor;

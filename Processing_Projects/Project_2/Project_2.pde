@@ -4,15 +4,15 @@ final String LEVELS_FOLDER_NAME = "levels";
 final String[] LEVELS_NAME = { "level1.lvl", "level2.lvl", "level3.lvl", "level4.lvl" };
 
 //Bubble colors
-final private color ORANGE = color(255, 128, 0);
-final private color GREEN = color(51, 255, 51);
-final private color RED = color(255, 51, 51);
-final private color BLUE = color(0, 0, 255);
-final private color PINK = color(255, 204, 204);
-final private color YELLOW = color(255, 255, 51);
+final color ORANGE = color(255, 128, 0);
+final color GREEN = color(51, 255, 51);
+final color RED = color(255, 51, 51);
+final color BLUE = color(0, 0, 255);
+final color PINK = color(255, 204, 204);
+final color YELLOW = color(255, 255, 51);
 
-final private int COLOR_AMMOUNT = 6;
-final private color[] COLORS = { ORANGE, GREEN, RED, BLUE, PINK, YELLOW };
+final int COLOR_AMMOUNT = 6;
+final color[] COLORS = { ORANGE, GREEN, RED, BLUE, PINK, YELLOW };
 
 //Playspace Config
 final int BUBBLE_SIZE = 50;
@@ -45,12 +45,14 @@ float timeElapsed;
 float timeElapsedAnimation;
 boolean isReloadingCannon;
 
+ArrayList<Bubble> removeBubblesQueue;
+ArrayList<Color> uniqueColors;
+
 //Playspace elements
 Cannon cannon;
 Ceiling ceiling;
 Bubble nextBubble;
 ArrayList<Bubble> bubbles;
-ArrayList<Bubble> removeBubblesQueue;
 BubbleGrid bubbleGrid;
 
 void settings()
@@ -76,15 +78,20 @@ void setup()
     cannonToNextBubbleDistX = abs(nextBubbleDisplayX - cannon.getX());
     cannonToNextBubbleDistY = abs(nextBubbleDisplayY - cannon.getY());
     
-    generateNextBubble();
-    reloadCannon();
-    
     loadLevel(LEVELS_NAME[0]);
 }
 
 private color randomColor()
 {
-    return COLORS[int(random(COLOR_AMMOUNT))];
+    if (uniqueColors.size() > 0)
+    {
+        return uniqueColors.get(int(random(uniqueColors.size()))).value;
+    }
+    else
+    {
+        println("random color!");
+        return COLORS[int(random(COLOR_AMMOUNT))];
+    }
 }
 
 void reloadCannonAnimation(float deltaT)
@@ -111,6 +118,7 @@ void reloadCannon()
 
 void generateNextBubble()
 {
+    uniqueColors = bubbleGrid.getUniqueColors();
     nextBubble = new Bubble(nextBubbleDisplayX, nextBubbleDisplayY, BUBBLE_SIZE, randomColor());
     bubbles.add(nextBubble);
 }
@@ -121,9 +129,6 @@ void reset()
     cannon.unloadBubble();
     bubbleGrid.clear();
     bubbles.clear();
-    
-    generateNextBubble();
-    reloadCannon();
 }
 
 void loadLevel(String levelName)
@@ -145,6 +150,11 @@ void loadLevel(String levelName)
             }
         }
     }
+    
+    uniqueColors = bubbleGrid.getUniqueColors();
+    
+    generateNextBubble();
+    reloadCannon();
 }
 
 void keyPressed()
@@ -244,9 +254,7 @@ void handleCollisions(Bubble b)
 void clearRemoveBubblesQueue()
 {
     for (Bubble b : removeBubblesQueue)
-    {
         bubbles.remove(b);
-    }
 }
 
 void updateBubbles()

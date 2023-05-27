@@ -215,7 +215,6 @@ class BubbleGrid
         {
             if (c.hasBubble())
             {
-                println("bubble detected!");
                 open.add(c);
             }
         }
@@ -230,7 +229,6 @@ class BubbleGrid
             {
                 if (adjacentCell.hasBubble() && !adjacentCell.isConnected() && !open.contains(adjacentCell))
                 {
-                    println("bubble detected combo!");
                     open.add(adjacentCell);
                 }
             }
@@ -257,6 +255,7 @@ class BubbleGrid
                 {
                     cell.getBubble().launch(PI / 2);
                     cell.getBubble().setCollision(false);
+                    cell.removeBubble();
                 }
             }
         }
@@ -284,6 +283,27 @@ class BubbleGrid
                 cell.removeBubble();
             }
         }
+    }
+    
+    public ArrayList<Color> getUniqueColors()
+    {
+        ArrayList<Color> uniqueColors = new ArrayList<Color>();
+        for (BubbleCell[] row : bubbleGrid)
+        {
+            for (BubbleCell cell : row)
+            {
+                if (cell.hasBubble())
+                {
+                    Color c = new Color(cell.getBubble().getColor());
+                    if (!uniqueColors.contains(c))
+                    {
+                        uniqueColors.add(c);
+                    }
+                }
+            }
+        }
+        println(uniqueColors.size());
+        return uniqueColors;
     }
     
     private void updateCells(float yOffset)
