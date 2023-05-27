@@ -76,11 +76,8 @@ void setup()
     cannonToNextBubbleDistX = abs(nextBubbleDisplayX - cannon.getX());
     cannonToNextBubbleDistY = abs(nextBubbleDisplayY - cannon.getY());
     
-    Bubble firstBubble = new Bubble(0, 0, BUBBLE_SIZE, randomColor());
-    bubbles.add(firstBubble);
-    cannon.loadBubble(firstBubble);
-    nextBubble = new Bubble(nextBubbleDisplayX, nextBubbleDisplayY, BUBBLE_SIZE, randomColor());
-    bubbles.add(nextBubble);
+    generateNextBubble();
+    reloadCannon();
     
     loadLevel(LEVELS_NAME[0]);
 }
@@ -206,7 +203,7 @@ void handleClusterFromCell(BubbleCell cell)
             removeBubblesQueue.add(c.getBubble());
             c.removeBubble();
         }
-        bubbleGrid.freeUnconnectedBubbles(ceiling.getLevel());
+        bubbleGrid.freeUnconnectedBubbles();
     }
 }
 

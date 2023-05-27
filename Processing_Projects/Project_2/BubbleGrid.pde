@@ -208,10 +208,10 @@ class BubbleGrid
         return closed;
     }
     
-    private void markConnectedCells(int ceilingLevel)
+    private void markConnectedCells()
     {
         ArrayList<BubbleCell> open = new ArrayList<BubbleCell>();
-        for (BubbleCell c : this.bubbleGrid[ceilingLevel])
+        for (BubbleCell c : this.bubbleGrid[0])
         {
             if (c.hasBubble())
             {
@@ -237,7 +237,7 @@ class BubbleGrid
         }
     }
     
-    public void freeUnconnectedBubbles(int ceilingLevel)
+    public void freeUnconnectedBubbles()
     {
         for (BubbleCell[] row : bubbleGrid)
         {
@@ -247,7 +247,7 @@ class BubbleGrid
             }
         }
         
-        markConnectedCells(ceilingLevel);
+        markConnectedCells();
         
         for (BubbleCell[] row : bubbleGrid)
         {
