@@ -22,8 +22,8 @@ final int BUBBLE_SIZE = 50;
 final int PADDING = 50;
 final int WIDTH_BUBBLES = 10;
 final int HEIGHT_BUBBLES = 17; //effective space for bubbles: HEIGHT_BUBBLES - CANNON_SPACE_BUBBLES
-final int MAX_BUBBLES = 10;
 final int CANNON_SPACE_BUBBLES = 2;
+final int MAX_BUBBLES = 15;
 final float COLLISION_OFFSET_MULTIPLIER = 0.9; //not recommended to go below 0.6 (why would you?)
 
 final int FONT_SIZE_SCORE = 50;
