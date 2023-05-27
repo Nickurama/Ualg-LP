@@ -262,6 +262,30 @@ class BubbleGrid
         }
     }
     
+    public void placeBubble(int row, int column, Bubble bubble)
+    {
+        if (row % 2 != 0)
+        {
+            column -= 1;
+        }
+        if (row >= 0 && row <= this.rows && column >= 0 && column <= this.columns)
+        {
+            bubbleGrid[row][column].setBubble(bubble);
+            bubble.setCell(bubbleGrid[row][column]);
+        }
+    }
+    
+    public void clear()
+    {
+        for (BubbleCell[] row : bubbleGrid)
+        {
+            for (BubbleCell cell : row)
+            {
+                cell.removeBubble();
+            }
+        }
+    }
+    
     private void updateCells(float yOffset)
     {
         for (BubbleCell[] row : bubbleGrid)

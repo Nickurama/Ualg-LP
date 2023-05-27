@@ -1,5 +1,18 @@
 final color BLACK = color(0, 0, 0);
-final private boolean DEBUG_MODE = true;
+final boolean DEBUG_MODE = true;
+final String LEVELS_FOLDER_NAME = "levels";
+final String[] LEVELS_NAME = { "level1.lvl", "level2.lvl", "level3.lvl", "level4.lvl" };
+
+//Bubble colors
+final private color ORANGE = color(255, 128, 0);
+final private color GREEN = color(51, 255, 51);
+final private color RED = color(255, 51, 51);
+final private color BLUE = color(0, 0, 255);
+final private color PINK = color(255, 204, 204);
+final private color YELLOW = color(255, 255, 51);
+
+final private int COLOR_AMMOUNT = 6;
+final private color[] COLORS = { ORANGE, GREEN, RED, BLUE, PINK, YELLOW };
 
 //Playspace Config
 final int BUBBLE_SIZE = 50;
@@ -63,11 +76,18 @@ void setup()
     cannonToNextBubbleDistX = abs(nextBubbleDisplayX - cannon.getX());
     cannonToNextBubbleDistY = abs(nextBubbleDisplayY - cannon.getY());
     
-    Bubble firstBubble = new Bubble(0, 0, BUBBLE_SIZE);
+    Bubble firstBubble = new Bubble(0, 0, BUBBLE_SIZE, randomColor());
     bubbles.add(firstBubble);
     cannon.loadBubble(firstBubble);
-    nextBubble = new Bubble(nextBubbleDisplayX, nextBubbleDisplayY, BUBBLE_SIZE);
+    nextBubble = new Bubble(nextBubbleDisplayX, nextBubbleDisplayY, BUBBLE_SIZE, randomColor());
     bubbles.add(nextBubble);
+    
+    loadLevel(LEVELS_NAME[0]);
+}
+
+private color randomColor()
+{
+    return COLORS[int(random(COLOR_AMMOUNT))];
 }
 
 void reloadCannonAnimation(float deltaT)
@@ -94,8 +114,40 @@ void reloadCannon()
 
 void generateNextBubble()
 {
-    nextBubble = new Bubble(nextBubbleDisplayX, nextBubbleDisplayY, BUBBLE_SIZE);
+    nextBubble = new Bubble(nextBubbleDisplayX, nextBubbleDisplayY, BUBBLE_SIZE, randomColor());
     bubbles.add(nextBubble);
+}
+
+void reset()
+{
+    ceiling.reset();
+    cannon.unloadBubble();
+    bubbleGrid.clear();
+    bubbles.clear();
+    
+    generateNextBubble();
+    reloadCannon();
+}
+
+void loadLevel(String levelName)
+{
+    reset();
+    
+    String[] lines = loadStrings(LEVELS_FOLDER_NAME + "\\" + levelName);
+    for (int i = 0; i < lines.length - 1; i++)
+    {
+        String tokens[] = split(lines[i], " ");
+        for (int j = 0; j < tokens.length; j++)
+        {
+            int n = Integer.parseInt(tokens[j]);
+            if (n != 0)
+            {
+                Bubble newBubble = new Bubble(0, 0, BUBBLE_SIZE, COLORS[n - 1]);
+                bubbles.add(newBubble);
+                bubbleGrid.placeBubble(i, j, newBubble);
+            }
+        }
+    }
 }
 
 void keyPressed()
@@ -114,6 +166,10 @@ void keyPressed()
         {
             isReloadingCannon = true;
         }
+    }
+    else if (keyCode == '1' || keyCode == '2' || keyCode == '3' || keyCode == '4')
+    {
+        loadLevel(LEVELS_NAME[Integer.parseInt(str(char(keyCode))) - 1]);
     }
 }
 
@@ -180,6 +236,7 @@ void handleCollisions(Bubble b)
             {
                 println("collision detected!");
                 b.stop();
+                b.setCollision(false);
                 bubbleGrid.snap(b, bubble);
                 handleClusterFromCell(b.getCell());
             }

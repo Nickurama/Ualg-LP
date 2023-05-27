@@ -1,6 +1,6 @@
 class Ceiling
 {
-    final private float COOLDOWN = 2;
+    final private float COOLDOWN = 10;
     
     private color topColor;
     private color descendingColor;
@@ -39,6 +39,12 @@ class Ceiling
                 level++;
             }
         }
+    }
+    
+    public void reset()
+    {
+        this.level = 0;
+        this.timeElapsed = 0;
     }
     
     public void draw()

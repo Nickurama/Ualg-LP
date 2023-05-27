@@ -1,15 +1,6 @@
 class Bubble
 {
-    //Bubble colors
-    final private color ORANGE = color(255, 128, 0);
-    final private color GREEN = color(51, 255, 51);
-    final private color RED = color(255, 51, 51);
-    final private color BLUE = color(0, 0, 255);
-    final private color PINK = color(255, 204, 204);
-    final private color YELLOW = color(255, 255, 51);
     
-    final private int COLOR_AMMOUNT = 6;
-    final private color[] COLORS = { ORANGE, GREEN, RED, BLUE, PINK, YELLOW };
     
     //fields
     final private int DEFAULT_SPEED = 15;
@@ -36,24 +27,6 @@ class Bubble
         this.isMoving = false;
         this.cell = null;
         this.hasCollision = false;
-    }
-    
-    public Bubble(int x, int y, int size)
-    {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.angle = 0;
-        this.drawColor = randomColor();
-        this.speed = DEFAULT_SPEED;
-        this.isMoving = false;
-        this.cell = null;
-        this.hasCollision = false;
-    }
-    
-    private color randomColor()
-    {
-        return COLORS[int(random(COLOR_AMMOUNT))];
     }
     
     private void move()
