@@ -235,8 +235,10 @@ class BubbleGrid
         }
     }
     
-    public void freeUnconnectedBubbles()
+    public int freeUnconnectedBubbles()
     {
+        int disconnectedBubblesAmmount = 0;
+        
         for (BubbleCell[] row : bubbleGrid)
         {
             for (BubbleCell cell : row)
@@ -253,12 +255,15 @@ class BubbleGrid
             {
                 if (cell.hasBubble && !cell.isConnected())
                 {
+                    disconnectedBubblesAmmount++;
                     cell.getBubble().launch(PI / 2);
                     cell.getBubble().setCollision(false);
                     cell.removeBubble();
                 }
             }
         }
+        
+        return disconnectedBubblesAmmount;
     }
     
     public void placeBubble(int row, int column, Bubble bubble)
@@ -272,6 +277,42 @@ class BubbleGrid
             bubbleGrid[row][column].setBubble(bubble);
             bubble.setCell(bubbleGrid[row][column]);
         }
+    }
+    
+    public boolean isEmpty()
+    {
+        boolean isEmpty = true;
+        for (BubbleCell[] row : bubbleGrid)
+        {
+            for (BubbleCell cell : row)
+            {
+                if (cell.hasBubble())
+                {
+                    return false;
+                }
+            }
+        }
+        return isEmpty;
+    }
+    
+    public float furthestPointY()
+    {
+        float value = 0;
+        if (!this.isEmpty())
+        {
+            for (BubbleCell[] row : bubbleGrid)
+            {
+                for (BubbleCell cell : row)
+                {
+                    if (cell.hasBubble() && cell.getY() > value)
+                    {
+                        value = cell.getY();
+                    }
+                }
+            }
+            value += this.halfBubbleSize;
+        }
+        return value;
     }
     
     public void clear()
@@ -302,7 +343,6 @@ class BubbleGrid
                 }
             }
         }
-        println(uniqueColors.size());
         return uniqueColors;
     }
     

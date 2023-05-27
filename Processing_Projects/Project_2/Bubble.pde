@@ -1,9 +1,7 @@
 class Bubble
 {
-    
-    
     //fields
-    final private int DEFAULT_SPEED = 15;
+    final private int DEFAULT_SPEED = 1500;
     
     private float x;
     private float y;
@@ -29,12 +27,12 @@ class Bubble
         this.hasCollision = false;
     }
     
-    private void move()
+    private void move(float deltaT)
     {
         if (isMoving)
         {
-            x += speed * cos(angle);
-            y += speed * sin(angle);
+            x += deltaT * speed * cos(angle);
+            y += deltaT * speed * sin(angle);
         }
     }
     
@@ -112,11 +110,9 @@ class Bubble
         }
     }
     
-    
-    
-    public void update()
+    public void update(float deltaT)
     {
-        move();
+        move(deltaT);
     }
     
     public void draw()
