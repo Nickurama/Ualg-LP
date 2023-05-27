@@ -2,6 +2,8 @@ final color BLACK = color(0, 0, 0);
 final boolean DEBUG_MODE = true;
 final String LEVELS_FOLDER_NAME = "levels";
 final String[] LEVELS_NAME = { "level1.lvl", "level2.lvl", "level3.lvl", "level4.lvl" };
+final String FONT_NAME = "Consolas-Bold-48.vlw";
+final int FONT_SIZE = 50;
 
 //Bubble colors
 final color ORANGE = color(255, 128, 0);
@@ -48,12 +50,15 @@ boolean isReloadingCannon;
 ArrayList<Bubble> removeBubblesQueue;
 ArrayList<Color> uniqueColors;
 
+PFont scoreFont;
+
 //Playspace elements
 Cannon cannon;
 Ceiling ceiling;
 Bubble nextBubble;
 ArrayList<Bubble> bubbles;
 BubbleGrid bubbleGrid;
+int score;
 
 void settings()
 {
@@ -64,6 +69,7 @@ void settings()
 
 void setup()
 {
+    scoreFont = loadFont(FONT_NAME);
     bubbleGrid = new BubbleGrid(PADDING, PADDING, HEIGHT_BUBBLES - CANNON_SPACE_BUBBLES, WIDTH_BUBBLES, BUBBLE_SIZE, PADDING);
     bubbles = new ArrayList<Bubble>();
     removeBubblesQueue = new ArrayList<Bubble>();
@@ -129,6 +135,7 @@ void reset()
     cannon.unloadBubble();
     bubbleGrid.clear();
     bubbles.clear();
+    score = 0;
 }
 
 void loadLevel(String levelName)
@@ -150,8 +157,6 @@ void loadLevel(String levelName)
             }
         }
     }
-    
-    uniqueColors = bubbleGrid.getUniqueColors();
     
     generateNextBubble();
     reloadCannon();
@@ -283,6 +288,23 @@ void update()
     bubbleGrid.update(ceiling.getLevel(), ceiling.getHeight());
 }
 
+void drawBubbles()
+{
+    for (Bubble b : bubbles)
+    {
+        b.draw();
+    }
+}
+
+void drawScore()
+{
+    textFont(scoreFont);
+    fill(BLACK);
+    textSize(FONT_SIZE);
+    textAlign(CENTER, CENTER);
+    text("SCORE:\n" + str(score),(windowWidth / 4) * 3, windowHeight - (2 * BUBBLE_SIZE));
+}
+
 void draw()
 {
     update();
@@ -295,12 +317,5 @@ void draw()
     cannon.draw();
     drawBubbles();
     ceiling.draw();
-}
-
-void drawBubbles()
-{
-    for (Bubble b : bubbles)
-    {
-        b.draw();
-    }
+    drawScore();
 }
