@@ -16,6 +16,7 @@ class SpinnerTip
         this.drawColor = drawColor;
         this.circleColor = circleColor;
         this.ringColor = ringColor;
+        
         // this.rotationAngle = rotationAngle;
     }
 
@@ -32,6 +33,9 @@ class SpinnerTip
         circle(0, -125, width * 1.1);
         fill(this.circleColor);
         circle(0, -125, width * 0.7);
+        imageMode(CENTER);
+        tint(this.circleColor);
+        image(ualgImage, 0, -125, width * 0.7, width * 0.7);
         
         noStroke();
         popMatrix();

@@ -7,6 +7,13 @@ final color BLACK = color(0, 0, 0);
 final color GREY = color(100, 100, 100);
 final color WHITE = color(255, 255, 255);
 float timeElapsed;
+PImage ualgImage;
+PImage fireImage;
+
+boolean isPressingMouse;
+float initialMouseX;
+float initialMouseY;
+float timeElapsedMouse;
 
 void settings()
 {
@@ -15,8 +22,11 @@ void settings()
 
 void setup()
 {
+    ualgImage = loadImage("logo.png");
+    fireImage = loadImage("fire_circle.png");
     timeElapsed = 0;
     spinner = new Spinner(512, 512, 0, 75, DARK_BLUE, BLACK, RED, GREEN, BLUE);
+    isPressingMouse = false;
 }
 
 void keyPressed()
@@ -49,11 +59,49 @@ void keyPressed()
     }
 }
 
+void mousePressed()
+{
+    isPressingMouse = true;
+    initialMouseX = mouseX;
+    initialMouseY = mouseY;
+}
+
+void mouseReleased()
+{
+    isPressingMouse = false;
+    float vectorX = mouseX - initialMouseX;
+    float vectorY = mouseY - initialMouseY;
+    float intensity = dist(mouseX, mouseY, initialMouseX, initialMouseY) / timeElapsedMouse;
+
+    int signal = 1;
+
+    if (vectorX >= vectorY)
+    {
+        if (initialMouseY >= spinner.y)
+        {
+            if (mouseX >= 0)
+                signal = 1;
+            else
+                signal = -1;
+        }
+    }
+    else
+    {
+
+    }
+    timeElapsedMouse = 0;
+}
+
 void update()
 {
     float oldTime = this.timeElapsed;
     this.timeElapsed = (float)millis() / 1000;
     float deltaT = this.timeElapsed - oldTime;
+
+    if (isPressingMouse)
+    {
+        timeElapsedMouse += deltaT;
+    }
 
     spinner.update(deltaT);
 }
@@ -63,5 +111,27 @@ void draw()
     update();
 
     background(WHITE);
+
     spinner.draw();
+
+    drawUI();
+
+    drawMouse();
+}
+
+void drawMouse()
+{
+    if (isPressingMouse)
+    {
+        line(initialMouseX, initialMouseY, mouseX, mouseY);
+    }
+}
+
+void drawUI()
+{
+    fill(BLACK);
+    textAlign(CENTER, CENTER);
+    textSize(75);
+    text("spins: " + spinner.spins, 200, 50);
+    text("Max RPS: " + spinner.maxRPS, 750, 50);
 }

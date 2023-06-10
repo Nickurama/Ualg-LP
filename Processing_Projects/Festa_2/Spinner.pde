@@ -14,6 +14,9 @@ class Spinner
     float rotationSpeed;
     final float dragCoefficient = 2 * PI;
 
+    final float fireRotationSpeed = PI / 4;
+    float fireAngle;
+
     int spins;
     float rotatedAmmount;
     int RPS;
@@ -34,10 +37,12 @@ class Spinner
         rotatedAmmount = 0;
         RPS = 0;
         maxRPS = 0;
+        fireAngle = 0;
     }
 
     public void update(float deltaT)
     {
+        fireAngle += fireRotationSpeed * deltaT;
         float previousRotationAngle = rotationAngle;
         float previousRotationSpeed = rotationSpeed;
         if (rotationSpeed > 0)
@@ -59,14 +64,36 @@ class Spinner
             spins++;
             rotatedAmmount -= 2 * PI;
         }
+        RPS = abs(int(rotationSpeed / (2 * PI)));
+        if (RPS > maxRPS)
+        {
+            maxRPS = RPS;
+        }
     }
 
     public void draw()
     {
+        if (RPS >= 10)
+        {
+            pushMatrix();
+            translate(x,y);
+            rotate(fireAngle);
+            imageMode(CENTER);
+            noTint();
+            image(fireImage, 0, 0, tipWidth * 6, tipWidth * 6);
+            popMatrix();
+        }
+
+
         pushMatrix();
         noStroke();
         translate(x,y);
         rectMode(CENTER);
+        
+        fill(BLACK);
+        textAlign(CENTER, CENTER);
+        textSize(50);
+        text(int(RPS), 0, -275);
         rotate(rotationAngle);
         tip1.draw();
         rotate(rotationOffset);
