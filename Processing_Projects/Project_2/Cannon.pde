@@ -83,6 +83,7 @@ class Cannon
         if (hasBubbleLoaded && !isRotating)
         {
             println("pew pew! :3");
+            loadedBubble.setCollision(true);
             loadedBubble.launch(angle - PI / 2); //cannon's 0º is up
             hasBubbleLoaded = false;
             hasShot = true;

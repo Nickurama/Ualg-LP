@@ -1,18 +1,7 @@
 class Bubble
 {
-    //Bubble colors
-    final private color ORANGE = color(255, 128, 0);
-    final private color GREEN = color(51, 255, 51);
-    final private color RED = color(255, 51, 51);
-    final private color BLUE = color(0, 0, 255);
-    final private color PINK = color(255, 204, 204);
-    final private color YELLOW = color(255, 255, 51);
-    
-    final private int COLOR_AMMOUNT = 6;
-    final private color[] COLORS = { ORANGE, GREEN, RED, BLUE, PINK, YELLOW };
-    
     //fields
-    final private int DEFAULT_SPEED = 15;
+    final private int DEFAULT_SPEED = 1500;
     
     private float x;
     private float y;
@@ -35,33 +24,15 @@ class Bubble
         this.speed = DEFAULT_SPEED;
         this.isMoving = false;
         this.cell = null;
-        this.hasCollision = true;
+        this.hasCollision = false;
     }
     
-    public Bubble(int x, int y, int size)
-    {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.angle = 0;
-        this.drawColor = randomColor();
-        this.speed = DEFAULT_SPEED;
-        this.isMoving = false;
-        this.cell = null;
-        this.hasCollision = true;
-    }
-    
-    private color randomColor()
-    {
-        return COLORS[int(random(COLOR_AMMOUNT))];
-    }
-    
-    private void move()
+    private void move(float deltaT)
     {
         if (isMoving)
         {
-            x += speed * cos(angle);
-            y += speed * sin(angle);
+            x += deltaT * speed * cos(angle);
+            y += deltaT * speed * sin(angle);
         }
     }
     
@@ -106,14 +77,13 @@ class Bubble
         return dist(b) < (float)size * collisionOffset;
     }
     
-    public boolean collidesCeiling(int padding)
+    public boolean collidesCeiling(float ceilingHeight)
     {
         boolean result = false;
-        if (this.y - (float)this.size / 2 < padding)
+        if (this.y - (float)this.size / 2 < ceilingHeight)
         {
             result = true;
-            stop();
-            this.y = padding + this.size / 2;
+            this.y = ceilingHeight + this.size / 2;
         }
         return result;
     }
@@ -140,11 +110,9 @@ class Bubble
         }
     }
     
-    
-    
-    public void update()
+    public void update(float deltaT)
     {
-        move();
+        move(deltaT);
     }
     
     public void draw()
@@ -155,6 +123,7 @@ class Bubble
         circle(x, y, size);
     }
     
+    public boolean isMoving() { return this.isMoving; }
     public void setCollision(boolean collision) { this.hasCollision = collision; }
     public boolean hasCollision() { return this.hasCollision; }
     public void setSpeed(float speed) { this.speed = speed; }
